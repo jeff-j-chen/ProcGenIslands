@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class EndlessTerrain : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public const float maxViewDst = 300;
+    public Transform viewer;
+    public static Vector2 viewerPosition;
+    int chunkSize;
+    int visibleChunks;
 
-    // Update is called once per frame
-    void Update()
-    {
+    void Start() {
         
     }
 }
