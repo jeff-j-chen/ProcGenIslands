@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
 public static class Noise {
-	public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int octaves, float persistance, float lacunarity, Vector2 offset) {
-        float[,] noiseMap = new float[mapWidth, mapHeight];
+	public static float[,] GenerateNoiseMap(int mapSize, int seed, float scale, int octaves, float persistence, float lacunarity, Vector2 offset) {
+        float[,] noiseMap = new float[mapSize, mapSize];
         // start off with a noise map with the set dimensions
         if (scale <= 0) {
             scale = 0.0001f;
@@ -20,11 +20,9 @@ public static class Noise {
 			octaveOffsets[i] = new Vector2(offsetX, offsetY);
             // add a place for the octave to be created
 		}
-		float halfWidth = mapWidth / 2f;
-		float halfHeight = mapHeight / 2f;
         // variables, used for zooming in to center
-        for (int y = 0; y < mapHeight; y++) {
-            for (int x = 0; x < mapWidth; x++) {
+        for (int y = 0; y < mapSize; y++) {
+            for (int x = 0; x < mapSize; x++) {
                 // for every coordate (x, y)
                 float amplitude = 1;
                 float frequency = 1;
@@ -38,7 +36,7 @@ public static class Noise {
                     float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
                     // use builtin perlin noise generation, but change it from 0-1 to -1 to 1
                     noiseHeight += perlinValue * amplitude;
-                    amplitude *= persistance;
+                    amplitude *= persistence;
                     frequency *= lacunarity;
                     // modify the variables, watch sebastian lague's 1st terrain generation if you forget
 				}

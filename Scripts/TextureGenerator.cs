@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class TextureGenerator {
-    public static Texture2D TextureFromColorMap(Color[] colorMap, int width, int height) {
-        Texture2D texture = new Texture2D(width, height);
+    public static Texture2D TextureFromColorMap(Color[] colorMap, int size) {
+        Texture2D texture = new Texture2D(size, size);
         // create a new texture
         texture.filterMode = FilterMode.Point;
         // point, as opposed to bilinear, filtering
@@ -19,17 +19,16 @@ public static class TextureGenerator {
     }
 
     public static Texture2D TextureFromHeightMap(float[,] heightMap) {
-        int width = heightMap.GetLength(0);
-        int height = heightMap.GetLength(1);
-        // get the width of the map based on the dimensions of the float[,]
-        Color[] colorMap = new Color[width * height];
+        int size = heightMap.GetLength(0);
+        // get the size of the map
+        Color[] colorMap = new Color[size * size];
         // create a new one-dimensional array of colors from the width and height
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                colorMap[y * width + x] = Color.Lerp(Color.black, Color.white, heightMap[x, y]);
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                colorMap[y * size + x] = Color.Lerp(Color.black, Color.white, heightMap[x, y]);
                 // at the given index, get the color (from black to white) based on the noisemap point at (x,y)
             }
         }
-        return TextureFromColorMap(colorMap, width, height);
+        return TextureFromColorMap(colorMap, size);
     }
 }
