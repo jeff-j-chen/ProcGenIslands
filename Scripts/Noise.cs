@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 public static class Noise {
-	public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int octaves, float persistance, float lacunarity, Vector2 offset) {
+	public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int octaves, float persistence, float lacunarity, Vector2 offset) {
         float[,] noiseMap = new float[mapWidth, mapHeight];
         // start off with a noise map with the set dimensions
         if (scale <= 0) {
@@ -38,7 +38,7 @@ public static class Noise {
                     float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
                     // use builtin perlin noise generation, but change it from 0-1 to -1 to 1
                     noiseHeight += perlinValue * amplitude;
-                    amplitude *= persistance;
+                    amplitude *= persistence;
                     frequency *= lacunarity;
                     // modify the variables, watch sebastian lague's 1st terrain generation if you forget
 				}
