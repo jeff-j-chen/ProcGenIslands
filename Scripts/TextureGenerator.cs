@@ -27,7 +27,7 @@ public static class TextureGenerator {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 colorMap[y * width + x] = Color.Lerp(Color.black, Color.white, heightMap[x, y]);
-                // at the given index, get the color (from black to whte) based on the noisemap point at (x,y)
+                // at the given index, get the color (from black to white) based on the noisemap point at (x,y)
             }
         }
         return TextureFromColorMap(colorMap, width, height);

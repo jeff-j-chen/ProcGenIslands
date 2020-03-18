@@ -165,15 +165,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawMode: 1
-  mapWidth: 2500
-  mapHeight: 2500
-  noiseScale: 500
+  mapWidth: 500
+  mapHeight: 500
+  noiseScale: 100
   octaves: 11
   persistance: 0.5
-  lacunarity: 2.1
+  lacunarity: 2
   seed: 1
   offset: {x: 0, y: 0}
-  autoUpdate: 0
+  autoUpdate: 1
   regions:
   - name: 1
     height: 0.1
@@ -188,23 +188,26 @@ MonoBehaviour:
     height: 0.4
     color: {r: 0.15619439, g: 0.38443118, b: 0.8490566, a: 0}
   - name: 5
-    height: 0.5
+    height: 0.45
     color: {r: 0.1802243, g: 0.39938956, b: 0.8490566, a: 0}
   - name: 6
-    height: 0.6
+    height: 0.5
     color: {r: 0.22272164, g: 0.4309268, b: 0.8584906, a: 0}
   - name: 7
-    height: 0.67
+    height: 0.64
     color: {r: 0.7830189, g: 0.77778727, b: 0.2622375, a: 0}
   - name: 8
-    height: 0.75
+    height: 0.74
     color: {r: 0.14524741, g: 0.6037736, b: 0.14524741, a: 0}
   - name: 9
-    height: 0.85
+    height: 0.67
     color: {r: 0.16558382, g: 0.5754717, b: 0.16558382, a: 0}
-  - name: land
-    height: 1
+  - name: 10
+    height: 0.87
     color: {r: 0.16776434, g: 0.5471698, b: 0.16776434, a: 0}
+  - name: 10
+    height: 1
+    color: {r: 0.14658241, g: 0.509434, b: 0.14658241, a: 0}
 --- !u!4 &1136209785
 Transform:
   m_ObjectHideFlags: 0
@@ -309,7 +312,7 @@ Transform:
   m_GameObject: {fileID: 1984405682}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2500, y: 1, z: 2500}
+  m_LocalScale: {x: 500, y: 1, z: 500}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
