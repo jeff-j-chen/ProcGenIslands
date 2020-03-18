@@ -165,8 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawMode: 1
-  mapWidth: 1000
-  mapHeight: 1000
+  mapSize: 1000
   noiseScale: 500
   octaves: 20
   persistance: 0.5
@@ -174,7 +173,7 @@ MonoBehaviour:
   seed: 7
   offset: {x: 0, y: 0}
   autoUpdate: 0
-  applyFalloffMap: 0
+  applyFalloffMap: 1
   regions:
   - name: 
     height: -0.5
