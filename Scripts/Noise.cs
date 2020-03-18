@@ -22,8 +22,6 @@ public static class Noise {
 		}
 		float halfWidth = mapWidth / 2f;
 		float halfHeight = mapHeight / 2f;
-            Color[] colorMap = new Color[mapWidth * mapHeight];
-        // make a new colormap to apply colors to
         // variables, used for zooming in to center
         for (int y = 0; y < mapHeight; y++) {
             for (int x = 0; x < mapWidth; x++) {
