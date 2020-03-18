@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 public class MapGenerator : MonoBehaviour {
-    public enum DrawMode { NoiseMap, ColorMap, FalloffMap };
+    public enum DrawMode { NoiseMap, ColorMap, FalloffMap, HueMap };
     public DrawMode drawMode;
 	public int mapSize;
 	public float noiseScale;
@@ -10,18 +10,25 @@ public class MapGenerator : MonoBehaviour {
 	[Range(0,1)]
 	public float persistance;
 	public float lacunarity;
+    public float hueFrequency;
 	public int seed;
 	public Vector2 offset;
 	public bool autoUpdate;
     public bool applyFalloffMap;
+    public bool applyHueRegions;
+    public float hueStrength;
     public TerrainType[] regions;
     private float[,] falloffMap;
+    private float[,] hueMap;
 
 	public void GenerateMap() {
+        if (applyFalloffMap) { falloffMap = FalloffGenerator.GenerateFalloffMap(mapSize); }
+        if (applyHueRegions) { hueMap = Noise.GenerateHueMap(mapSize, seed, noiseScale, hueFrequency, offset); }
 		float[,] noiseMap = Noise.GenerateNoiseMap(mapSize, seed, noiseScale, octaves, persistance, lacunarity, offset);
         // generate the noise map with the given variables
         Color[] colorMap = new Color[mapSize * mapSize];
         // make a new colormap to apply colors to
+        float H, S, V;
         for (int y = 0; y < mapSize; y++) {
             for (int x = 0; x < mapSize; x++) {
                 // for every coordinate
@@ -35,7 +42,12 @@ public class MapGenerator : MonoBehaviour {
                     // for every region
                     if (currentHeight <= regions[i].height) {
                         // found the region that the point belongs to 
-                        colorMap[y * mapSize + x] = regions[i].color;
+                        Color newColor = regions[i].color;
+                        if (applyHueRegions && currentHeight <= 0.2 && hueMap[x, y] > 0) {
+                            Color.RGBToHSV(newColor, out H, out S, out V);
+                            newColor = Color.HSVToRGB(H - hueMap[x, y]/hueStrength, S, V);
+                        }
+                        colorMap[y * mapSize + x] = newColor;
                         // assign the color at given point to the colormap
                         break;
                         // no need to check other regions, so break out
@@ -49,7 +61,7 @@ public class MapGenerator : MonoBehaviour {
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(noiseMap)); }
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapSize)); }
         else if (drawMode == DrawMode.FalloffMap) { TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFalloffMap(mapSize)); }
-        // draw the noise or color map on the plane, based on which one we want
+        else if (drawMode == DrawMode.HueMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(Noise.GenerateHueMap(mapSize, seed, noiseScale, hueFrequency, offset))); }
 	}
 
 	void OnValidate() {
@@ -58,7 +70,6 @@ public class MapGenerator : MonoBehaviour {
 		if (lacunarity < 1) { lacunarity = 1; }
 		if (octaves < 0) { octaves = 0; }
         // limit some variables
-        falloffMap = FalloffGenerator.GenerateFalloffMap(mapSize);
 	}
 }
 

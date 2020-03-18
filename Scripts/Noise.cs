@@ -20,7 +20,6 @@ public static class Noise {
 			octaveOffsets[i] = new Vector2(offsetX, offsetY);
             // add a place for the octave to be created
 		}
-        // variables, used for zooming in to center
         for (int y = 0; y < mapSize; y++) {
             for (int x = 0; x < mapSize; x++) {
                 // for every coordate (x, y)
@@ -32,7 +31,7 @@ public static class Noise {
                     // for every octave
 					float sampleX = x / scale * frequency + octaveOffsets[i].x;
 					float sampleY = y / scale * frequency + octaveOffsets[i].y;
-                    // alter coords based on the octave offset, zoom in to the center with half width/height
+                    // alter coords based on the octave offset
                     float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
                     // use builtin perlin noise generation, but change it from 0-1 to -1 to 1
                     noiseHeight += perlinValue * amplitude;
@@ -50,4 +49,23 @@ public static class Noise {
         // return the created float array
 	}
 
+	public static float[,] GenerateHueMap(int mapSize, int seed, float scale, float frequency, Vector2 offset) {
+        float[,] noiseMap = new float[mapSize, mapSize];
+        if (scale <= 0) {
+            scale = 0.0001f;
+        }
+		System.Random prng = new System.Random(seed + 1);
+        // use the seed of 1 more, because we want it to be different but still predictable (regions are generated off the previous seed so we want a different region for ocean colors)
+        float offsetX = prng.Next(-100000, 100000) + offset.x;
+        float offsetY = prng.Next(-100000, 100000) + offset.y;
+        for (int y = 0; y < mapSize; y++) {
+            for (int x = 0; x < mapSize; x++) {
+                float sampleX = x / scale * frequency + offsetX;
+                float sampleY = y / scale * frequency + offsetY;
+                float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
+                noiseMap[x,y] = perlinValue;
+			}
+		}
+        return noiseMap;
+	}
 }
