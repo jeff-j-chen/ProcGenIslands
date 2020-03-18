@@ -2,24 +2,22 @@ using UnityEngine;
 using System.Collections;
 
 public class MapGenerator : MonoBehaviour {
-    public enum DrawMode { NoiseMap, ColorMap, FalloffMap };
+    public enum DrawMode { NoiseMap, ColorMap };
     public DrawMode drawMode;
 	public int mapWidth;
 	public int mapHeight;
 	public float noiseScale;
 	public int octaves;
 	[Range(0,1)]
-	public float persistence;
+	public float persistance;
 	public float lacunarity;
 	public int seed;
 	public Vector2 offset;
 	public bool autoUpdate;
     public TerrainType[] regions;
-    public bool applyFalloffMap;
-    float[,] falloffMap;
 
 	public void GenerateMap() {
-		float[,] noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistence, lacunarity, offset);
+		float[,] noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, offset);
         // generate the noise map with the given variables
         Color[] colorMap = new Color[mapWidth * mapHeight];
         // make a new colormap to apply colors to
@@ -55,7 +53,6 @@ public class MapGenerator : MonoBehaviour {
 		if (lacunarity < 1) { lacunarity = 1; }
 		if (octaves < 0) { octaves = 0; }
         // limit some variables
-        // falloffMap = FalloffGenerator.GenerateFalloffMap(mapWidth);
 	}
 }
 
