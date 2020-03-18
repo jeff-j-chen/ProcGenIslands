@@ -165,64 +165,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawMode: 1
-  mapWidth: 11
-  mapHeight: 11
-  noiseScale: 500
-  octaves: 20
+  mapWidth: 500
+  mapHeight: 500
+  noiseScale: 100
+  octaves: 11
   persistance: 0.5
   lacunarity: 2
-  seed: 7
+  seed: 1
   offset: {x: 0, y: 0}
-  autoUpdate: 0
+  autoUpdate: 1
   regions:
-  - name: 
-    height: -0.5
-    color: {r: 0.05833925, g: 0.22541636, b: 0.6509434, a: 0}
-  - name: 
-    height: -0.4
-    color: {r: 0.07369172, g: 0.2421239, b: 0.6792453, a: 0}
-  - name: 
-    height: -0.3
-    color: {r: 0.08566215, g: 0.26457354, b: 0.7264151, a: 0}
-  - name: 
-    height: -0.2
-    color: {r: 0.13082945, g: 0.3134861, b: 0.7924528, a: 0}
-  - name: 
-    height: -0.1
-    color: {r: 0.18039213, g: 0.36433598, b: 0.8509804, a: 0}
-  - name: 
-    height: 0
-    color: {r: 0.20784312, g: 0.46361148, b: 0.8666667, a: 0}
-  - name: 
+  - name: 1
     height: 0.1
-    color: {r: 0.2300641, g: 0.51630896, b: 0.8867924, a: 0}
-  - name: 
+    color: {r: 0.06594872, g: 0.28770894, b: 0.735849, a: 0}
+  - name: 2
     height: 0.2
-    color: {r: 0.24705881, g: 0.57047087, b: 0.85882354, a: 0}
-  - name: 
+    color: {r: 0.10622107, g: 0.31152678, b: 0.7264151, a: 0}
+  - name: 3
     height: 0.3
-    color: {r: 0.7830189, g: 0.7733381, b: 0.4764596, a: 0}
-  - name: 
+    color: {r: 0.13995194, g: 0.3590753, b: 0.8018868, a: 0}
+  - name: 4
     height: 0.4
-    color: {r: 0.7647059, g: 0.7529412, b: 0.39215687, a: 0}
-  - name: 
+    color: {r: 0.15619439, g: 0.38443118, b: 0.8490566, a: 0}
+  - name: 5
+    height: 0.45
+    color: {r: 0.1802243, g: 0.39938956, b: 0.8490566, a: 0}
+  - name: 6
     height: 0.5
-    color: {r: 0.7264151, g: 0.71462077, b: 0.3529281, a: 0}
-  - name: 
-    height: 0.6
-    color: {r: 0.20044097, g: 0.6509434, b: 0.19344072, a: 0}
-  - name: 
-    height: 0.7
-    color: {r: 0.17457734, g: 0.6226415, b: 0.16740832, a: 0}
-  - name: 
-    height: 0.8
-    color: {r: 0.20703563, g: 0.5754717, b: 0.1981577, a: 0}
-  - name: 
-    height: 0.9
-    color: {r: 0.20075376, g: 0.5660378, b: 0.19490923, a: 0}
-  - name: 
+    color: {r: 0.22272164, g: 0.4309268, b: 0.8584906, a: 0}
+  - name: 7
+    height: 0.64
+    color: {r: 0.7830189, g: 0.77778727, b: 0.2622375, a: 0}
+  - name: 8
+    height: 0.74
+    color: {r: 0.14524741, g: 0.6037736, b: 0.14524741, a: 0}
+  - name: 9
+    height: 0.67
+    color: {r: 0.16558382, g: 0.5754717, b: 0.16558382, a: 0}
+  - name: 10
+    height: 0.87
+    color: {r: 0.16776434, g: 0.5471698, b: 0.16776434, a: 0}
+  - name: 10
     height: 1
-    color: {r: 0.1757383, g: 0.5283019, b: 0.17194732, a: 0}
+    color: {r: 0.14658241, g: 0.509434, b: 0.14658241, a: 0}
 --- !u!4 &1136209785
 Transform:
   m_ObjectHideFlags: 0
@@ -327,7 +312,7 @@ Transform:
   m_GameObject: {fileID: 1984405682}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 11, y: 1, z: 11}
+  m_LocalScale: {x: 500, y: 1, z: 500}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
