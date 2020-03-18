@@ -9,7 +9,7 @@ public class MapGenerator : MonoBehaviour {
 	public float noiseScale;
 	public int octaves;
 	[Range(0,1)]
-	public float persistence;
+	public float persistance;
 	public float lacunarity;
 	public int seed;
 	public Vector2 offset;
@@ -17,7 +17,7 @@ public class MapGenerator : MonoBehaviour {
     public TerrainType[] regions;
 
 	public void GenerateMap() {
-		float[,] noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistence, lacunarity, offset);
+		float[,] noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, offset);
         // generate the noise map with the given variables
         Color[] colorMap = new Color[mapWidth * mapHeight];
         // make a new colormap to apply colors to
@@ -42,7 +42,7 @@ public class MapGenerator : MonoBehaviour {
 		MapDisplay display = FindObjectOfType<MapDisplay>();
         // get the display script
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(noiseMap)); }
-        else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapWidth, mapHeight)); }
+        else { display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapWidth, mapHeight)); }
         // draw the noise or color map on the plane, based on which one we want
 	}
 
