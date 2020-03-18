@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 public class MapGenerator : MonoBehaviour {
-    public enum DrawMode { NoiseMap, ColorMap };
+    public enum DrawMode { NoiseMap, ColorMap, FalloffMap };
     public DrawMode drawMode;
 	public int mapWidth;
 	public int mapHeight;
@@ -14,7 +14,9 @@ public class MapGenerator : MonoBehaviour {
 	public int seed;
 	public Vector2 offset;
 	public bool autoUpdate;
+    public bool applyFalloffMap;
     public TerrainType[] regions;
+    private float[,] falloffMap;
 
 	public void GenerateMap() {
 		float[,] noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, offset);
@@ -24,6 +26,10 @@ public class MapGenerator : MonoBehaviour {
         for (int y = 0; y < mapHeight; y++) {
             for (int x = 0; x < mapWidth; x++) {
                 // for every coordinate
+                if (applyFalloffMap) {
+                    noiseMap[x,y] -= falloffMap[x,y];
+                }
+                // if apply falloffmap, alter (x,y) as such
                 float currentHeight = noiseMap[x, y];
                 // get the current height at (x, y)
                 for (int i = 0; i < regions.Length; i++) {
@@ -42,7 +48,8 @@ public class MapGenerator : MonoBehaviour {
 		MapDisplay display = FindObjectOfType<MapDisplay>();
         // get the display script
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(noiseMap)); }
-        else { display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapWidth, mapHeight)); }
+        else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapWidth, mapHeight)); }
+        else if (drawMode == DrawMode.FalloffMap) { TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFalloffMap(mapWidth)); }
         // draw the noise or color map on the plane, based on which one we want
 	}
 
@@ -53,6 +60,7 @@ public class MapGenerator : MonoBehaviour {
 		if (lacunarity < 1) { lacunarity = 1; }
 		if (octaves < 0) { octaves = 0; }
         // limit some variables
+        falloffMap = FalloffGenerator.GenerateFalloffMap(mapWidth);
 	}
 }
 
