@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class MapGenerator : MonoBehaviour {
-    public enum DrawMode { NoiseMap, ColorMap, FalloffMap, HueMap };
-    public DrawMode drawMode;
 	public int mapSize;
 	public float noiseScale;
 	public int octaves = 7;
@@ -15,32 +13,15 @@ public class MapGenerator : MonoBehaviour {
 	public int seed;
 	public Vector2 offset;
 	public bool autoUpdate;
-    public bool applyFalloffMap;
     public bool applyHueRegions;
-    public bool generateNewOctaves;
-    public List<int> octaveXs;
-    public List<int> octaveYs;
     public float hueStrength;
     public TerrainType[] regions;
-    private float[,] falloffMap;
     private float[,] hueMap;
 
 	public void GenerateMap() {
-        if (generateNewOctaves) {
-            octaveXs.Clear();
-            octaveYs.Clear();
-            System.Random prng = new System.Random(seed);
-            for (int i = 0; i < octaves; i++) {
-                octaveYs.Add(prng.Next(-10000, 10000));
-                octaveXs.Add(prng.Next(-10000, 10000));
-            }
-        }
-        // print("started generation");
-        if (applyFalloffMap) { falloffMap = FalloffGenerator.GenerateFalloffMap(mapSize); }
-        // print("finished falloff");
         if (applyHueRegions) { hueMap = Noise.GenerateHueMap(mapSize, seed, noiseScale, hueFrequency, offset); }
         // print("finished hue");
-		float[,] noiseMap = Noise.GenerateNoiseMap(mapSize, seed, noiseScale, octaves, persistance, lacunarity, offset, octaveXs, octaveYs);
+		float[,] noiseMap = Noise.GenerateNoiseMap(mapSize, seed, noiseScale, octaves, persistance, lacunarity, offset);
         // print("finished noise map");
         // generate the noise map with the given variables
         Color[] colorMap = new Color[mapSize * mapSize];
@@ -49,9 +30,6 @@ public class MapGenerator : MonoBehaviour {
         for (int y = 0; y < mapSize; y++) {
             for (int x = 0; x < mapSize; x++) {
                 // for every coordinate
-                if (applyFalloffMap) {
-                    noiseMap[x,y] -= falloffMap[x,y];
-                }
                 // if apply falloffmap, alter (x,y) as such
                 float currentHeight = noiseMap[x, y];
                 // get the current height at (x, y)
@@ -76,11 +54,7 @@ public class MapGenerator : MonoBehaviour {
         // return the created float array
 		MapDisplay display = FindObjectOfType<MapDisplay>();
         // get the display script
-        if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(noiseMap)); }
-        else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapSize)); }
-        else if (drawMode == DrawMode.FalloffMap) { TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFalloffMap(mapSize)); }
-        else if (drawMode == DrawMode.HueMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(Noise.GenerateHueMap(mapSize, seed, noiseScale, hueFrequency, offset))); }
-        // print("finished applying texture");
+        display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapSize));
 	}
 
 	void OnValidate() {
