@@ -1,12 +1,13 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MapGenerator : MonoBehaviour {
     public enum DrawMode { NoiseMap, ColorMap, FalloffMap, HueMap };
     public DrawMode drawMode;
 	public int mapSize;
 	public float noiseScale;
-	public int octaves;
+	public int octaves = 7;
 	[Range(0,1)]
 	public float persistance;
 	public float lacunarity;
@@ -16,15 +17,31 @@ public class MapGenerator : MonoBehaviour {
 	public bool autoUpdate;
     public bool applyFalloffMap;
     public bool applyHueRegions;
+    public bool generateNewOctaves;
+    public List<int> octaveXs;
+    public List<int> octaveYs;
     public float hueStrength;
     public TerrainType[] regions;
     private float[,] falloffMap;
     private float[,] hueMap;
 
 	public void GenerateMap() {
+        if (generateNewOctaves) {
+            octaveXs.Clear();
+            octaveYs.Clear();
+            System.Random prng = new System.Random(seed);
+            for (int i = 0; i < octaves; i++) {
+                octaveYs.Add(prng.Next(-10000, 10000));
+                octaveXs.Add(prng.Next(-10000, 10000));
+            }
+        }
+        // print("started generation");
         if (applyFalloffMap) { falloffMap = FalloffGenerator.GenerateFalloffMap(mapSize); }
+        // print("finished falloff");
         if (applyHueRegions) { hueMap = Noise.GenerateHueMap(mapSize, seed, noiseScale, hueFrequency, offset); }
-		float[,] noiseMap = Noise.GenerateNoiseMap(mapSize, seed, noiseScale, octaves, persistance, lacunarity, offset);
+        // print("finished hue");
+		float[,] noiseMap = Noise.GenerateNoiseMap(mapSize, seed, noiseScale, octaves, persistance, lacunarity, offset, octaveXs, octaveYs);
+        // print("finished noise map");
         // generate the noise map with the given variables
         Color[] colorMap = new Color[mapSize * mapSize];
         // make a new colormap to apply colors to
@@ -55,6 +72,7 @@ public class MapGenerator : MonoBehaviour {
                 }
             }
         }
+        // print("finished coloring");
         // return the created float array
 		MapDisplay display = FindObjectOfType<MapDisplay>();
         // get the display script
@@ -62,6 +80,7 @@ public class MapGenerator : MonoBehaviour {
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapSize)); }
         else if (drawMode == DrawMode.FalloffMap) { TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFalloffMap(mapSize)); }
         else if (drawMode == DrawMode.HueMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(Noise.GenerateHueMap(mapSize, seed, noiseScale, hueFrequency, offset))); }
+        // print("finished applying texture");
 	}
 
 	void OnValidate() {

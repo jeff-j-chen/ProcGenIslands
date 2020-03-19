@@ -165,17 +165,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawMode: 1
-  mapSize: 5000
-  noiseScale: 500
-  octaves: 10
+  mapSize: 100
+  noiseScale: 100
+  octaves: 7
   persistance: 0.5
   lacunarity: 2
   hueFrequency: 0.25
   seed: 142
-  offset: {x: 0, y: 0}
-  autoUpdate: 0
-  applyFalloffMap: 1
-  applyHueRegions: 1
+  offset: {x: -3.34, y: 0}
+  autoUpdate: 1
+  applyFalloffMap: 0
+  applyHueRegions: 0
+  generateNewOctaves: 1
+  octaveXs: a7feffffad1c0000e70b00002b0e0000a70a00009ff2fffff3f3ffff
+  octaveYs: 14200000d6daffffb4f1ffff590200008a030000d81f000086ecffff
   hueStrength: 4
   regions:
   - name: t
@@ -342,7 +345,7 @@ Transform:
   m_GameObject: {fileID: 1984405682}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5000, y: 1, z: 5000}
+  m_LocalScale: {x: 100, y: 1, z: 100}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
