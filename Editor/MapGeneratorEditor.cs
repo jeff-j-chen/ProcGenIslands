@@ -14,14 +14,12 @@ public class MapGeneratorEditor : Editor {
         if (DrawDefaultInspector()) {
             // draw the default inspector (if any value was changed)
             if (mapGen.autoUpdate) {
-                // if we want the map to automatically update
-                mapGen.GenerateMap();
-                // do so
+                mapGen.GenerateChunkAt(mapGen.center);
             }
         }
         if (GUILayout.Button("Generate")) {
             // if player clicked the "generate" button
-            mapGen.GenerateMap();
+            mapGen.GenerateChunkAt(mapGen.center);
             // generate the map
         }
     }
