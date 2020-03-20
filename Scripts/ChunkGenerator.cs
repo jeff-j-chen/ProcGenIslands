@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class ChunkGenerator : MonoBehaviour {
+    [Header("Main")]
     public GameObject mapPrefab;
     // the gameobject sprite prefab we are creating
 	public int chunkSize;
@@ -19,31 +20,37 @@ public class ChunkGenerator : MonoBehaviour {
     // frequency of the noise to create, bigger number is bigger noise
 	public int seed;
     // the seed to pass in
+    public Vector2 center;
+    // the center where to spawn the chunk at
+    public TerrainType[] regions;
+    // array of structure which manages the colors applied to varying heights
 	public bool autoUpdate;
     // whether or not to automatically update the map every time something changes
+    [Header("Hue")]
     public bool applyHueRegions;
     // whether or not to apply the hue (green/blue) regions onto the map
     public float hueStrength;
+    private float[,] hueMap;
+    // float array representing the hue map
     // the strength of the hue to apply, bigger number is smaller effect
+    [Header("Dither")]
     public bool applyDither;
     // whether or not to apply dithering to the map
     public float ditherStrength;
     // the strength of the dither to apply, bigger number is smaller effect
-    public TerrainType[] regions;
-    // array of structure which manages the colors applied to varying heights
-    private float[,] hueMap;
-    // float array representing the hue map
     private float[,] ditherMap;
     // float array representing the dither map
-    private Vector2 origin = new Vector2(0.5f, 0.5f);
-    // pivot point to give sprites a pivot at their center
-    public Vector2 center;
-    // the center where to spawn the chunk at
+    [Header("Coral")]
+    public Color[] coralColors = new Color[5];
+    public float coralScale;
+    public float coralFrequency;
+    [Header("Other")]
     public List<GameObject> chunks = new List<GameObject>();
     // list of created chunks
     public GameObject centerChunk;
-    public Color[] coralColors = new Color[5];
     // pink purple yellow red blue
+    private Vector2 origin = new Vector2(0.5f, 0.5f);
+    // pivot point to give sprites a pivot at their center
 
 	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
         if (applyHueRegions) { hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center); }
@@ -84,7 +91,6 @@ public class ChunkGenerator : MonoBehaviour {
                 }
             }
         }
-        // print("finished coloring");
         Texture2D texture = new Texture2D(chunkSize, chunkSize);
         // create a new texture
         texture.filterMode = FilterMode.Point;
@@ -95,15 +101,40 @@ public class ChunkGenerator : MonoBehaviour {
         // set the pixels of the texture
         texture.Apply();
         // apply it
-        GameObject newChunk = Instantiate(mapPrefab, center, Quaternion.identity);
-        // instantiate a new chunk gameobject
         if (removeExisting) { 
             foreach(GameObject chunk in chunks) { DestroyImmediate(chunk); }
             chunks.Clear();
         }
+        // remove any existing chunks if desired (used for editing in scene mode)
+        GameObject newChunk = Instantiate(mapPrefab, center, Quaternion.identity);
+        // instantiate a new chunk gameobject
+        newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
+        // create a sprite from the chunk
+        chunks.Add(newChunk);
+        // add it to the list
+        return newChunk;
+	}
+
+	public GameObject CoralChunkTest(Vector2 center) {
+        hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center);
+        ditherMap = Noise.GenerateDitherMap(chunkSize, seed, center, ditherStrength);
+		float[,] noiseMap = Noise.GenerateCoralMap(chunkSize, hueMap, seed, coralScale, coralFrequency, center);
+        Color[] colorMap = new Color[chunkSize * chunkSize];
+        for (int y = 0; y < chunkSize; y++) {
+            for (int x = 0; x < chunkSize; x++) {
+                colorMap[y * chunkSize + x] = Color.Lerp(Color.black, Color.white, noiseMap[x,y]);
+            }
+        }
+        Texture2D texture = new Texture2D(chunkSize, chunkSize);
+        texture.filterMode = FilterMode.Point;
+        texture.wrapMode = TextureWrapMode.Clamp;
+        texture.SetPixels(colorMap);
+        texture.Apply();
+        foreach(GameObject chunk in chunks) { DestroyImmediate(chunk); }
+        chunks.Clear();
+        GameObject newChunk = Instantiate(mapPrefab, center, Quaternion.identity);
         newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
         chunks.Add(newChunk);
-        // create a sprite from the chunk
         return newChunk;
 	}
 
@@ -123,3 +154,33 @@ public struct TerrainType {
     public Color color;
     // create a new structure used for assigning colors
 }
+
+// public static class TextureGenerator {
+//     public static Texture2D TextureFromColorMap(Color[] colorMap, int size) {
+//         Texture2D texture = new Texture2D(size, size);
+//         // create a new texture
+//         texture.filterMode = FilterMode.Point;
+//         // point, as opposed to bilinear, filtering
+//         texture.wrapMode = TextureWrapMode.Clamp;
+//         // clamp, as opposed to wrap, wrap mode
+//         texture.SetPixels(colorMap);
+//         // set the pixels of the texture
+//         texture.Apply();
+//         // apply it
+//         return texture;
+//         // return it
+//     }
+
+//     public static Texture2D TextureFromHeightMap(float[,] heightMap) {
+//         int size = heightMap.GetLength(0);
+//         // get the width of the map based on the dimensions of the float[,]
+//         Color[] colorMap = new Color[size * size];
+//         // create a new one-dimensional array of colors from the width and height
+//         for (int y = 0; y < size; y++) {
+//             for (int x = 0; x < size; x++) {
+//                 colorMap[y * size + x] = Color.Lerp(Color.black, Color.white, heightMap[x, y]);
+//                 // at the given index, get the color (from black to white) based on the noisemap point at (x,y)
+//             }
+//         }
+//         return TextureFromColorMap(colorMap, size);
+// }

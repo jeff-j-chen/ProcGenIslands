@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
 public static class Noise {
-	public static float[,] GenerateNoiseMap(int mapSize, int seed, float scale, int octaves, float persistence, float lacunarity, Vector2 center) {
-        float[,] noiseMap = new float[mapSize, mapSize];
-        // start off with a noise map with the set dimensions
+	public static float[,] GenerateNoiseMap(int chunkSize, int seed, float scale, int octaves, float persistence, float lacunarity, Vector2 center) {
+        float[,] noiseMap = new float[chunkSize, chunkSize];
+        // start off with a noise chunk with the set dimensions
         if (scale <= 0) {
             scale = 0.0001f;
             // clamp the scale, so no division by 0 or negative problems
@@ -20,10 +20,10 @@ public static class Noise {
 			octavecenters[i] = new Vector2(centerX, centerY);
             // add a place for the octave to be created
 		}
-        float halfSize = mapSize / 2f;
-        // used for centering the map
-        for (int y = 0; y < mapSize; y++) {
-            for (int x = 0; x < mapSize; x++) {
+        float halfSize = chunkSize / 2f;
+        // used for centering the chunk
+        for (int y = 0; y < chunkSize; y++) {
+            for (int x = 0; x < chunkSize; x++) {
                 // for every coordinate (x, y)
                 float amplitude = 1;
                 float frequency = 1;
@@ -49,9 +49,9 @@ public static class Noise {
         // return the created float array
 	}
 
-	public static float[,] GenerateHueMap(int mapSize, int seed, float scale, float frequency, Vector2 center) {
-        float[,] noiseMap = new float[mapSize, mapSize];
-        // create a new map
+	public static float[,] GenerateHueMap(int chunkSize, int seed, float scale, float frequency, Vector2 center) {
+        float[,] noiseMap = new float[chunkSize, chunkSize];
+        // create a new chunk
         if (scale <= 0) {
             scale = 0.0001f;
         }
@@ -59,9 +59,9 @@ public static class Noise {
 		System.Random prng = new System.Random(seed * 2);
         float centerX = prng.Next(-10000, 10000) + center.x;
         float centerY = prng.Next(-10000, 10000) + center.y;
-        float halfSize = mapSize / 2f;
-        for (int y = 0; y < mapSize; y++) {
-            for (int x = 0; x < mapSize; x++) {
+        float halfSize = chunkSize / 2f;
+        for (int y = 0; y < chunkSize; y++) {
+            for (int x = 0; x < chunkSize; x++) {
                 float sampleX = (((x - halfSize + centerX) / scale) * frequency);
                 float sampleY = (((y - halfSize + centerY) / scale) * frequency);
                 float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2f - 1f;
@@ -71,17 +71,67 @@ public static class Noise {
         return noiseMap;
 	}
 
-    public static float[,] GenerateDitherMap(int mapSize, int seed, Vector2 center, float ditherStrength) {
-        float[,] noiseMap = new float[mapSize, mapSize];
+    public static float[,] GenerateDitherMap(int chunkSize, int seed, Vector2 center, float ditherStrength) {
+        float[,] noiseMap = new float[chunkSize, chunkSize];
 		System.Random prng = new System.Random(seed / 2);
         float centerX = prng.Next(-10000, 10000) + center.x;
         float centerY = prng.Next(-10000, 10000) + center.y;
-        float halfSize = mapSize / 2f;
-        for (int y = 0; y < mapSize; y++) {
-            for (int x = 0; x < mapSize; x++) {
+        float halfSize = chunkSize / 2f;
+        for (int y = 0; y < chunkSize; y++) {
+            for (int x = 0; x < chunkSize; x++) {
                 noiseMap[x,y] = ((float)prng.NextDouble() * 2f + 1f)/ditherStrength;
 			}
 		}
         return noiseMap;
 	}
+
+    public static float[,] GenerateCoralMap(int chunkSize, float[,] hueMap, int seed, float scale, float frequency, Vector2 center) {
+        float[,] noiseMap = new float[chunkSize, chunkSize];
+        // generate chunks of coral (squares? circles?) with one color, all across the ocean where the huemap makes it green
+        // run completely random filters over the chunks, more filters where there is less green, several times, generating blocks of coral with the same color and increasing density towards the center
+        // use the int[,] in chunkgenerator to get the color from the array and apply it to that point
+        // apply noise filter to the coral as well?
+        System.Random prng = new System.Random(seed - 2);
+        float centerX = prng.Next(-10000, 10000) + center.x;
+        float centerY = prng.Next(-10000, 10000) + center.y;
+        float halfSize = chunkSize / 2f;
+        for (int y = 0; y < chunkSize; y++) {
+            for (int x = 0; x < chunkSize; x++) {
+                hueMap[x,y] = hueMap[x,y] < 0 ? 0 : hueMap[x,y];
+                if (prng.Next(100) <= 10 * hueMap[x,y]) {
+                    noiseMap = GenerateCoralShape(noiseMap, x, y, seed);
+                }
+                // float sampleX = (((x - halfSize + centerX) / scale) * frequency);
+                // float sampleY = (((y - halfSize + centerY) / scale) * frequency);
+                // float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
+                // noiseMap[x,y] = perlinValue;
+            }
+        }
+        return noiseMap;
+    }
+
+    private static float[,] GenerateCoralShape(float[,] noiseMap, int x, int y, int seed) {
+        System.Random prng = new System.Random(seed + 2);
+        int rand = prng.Next(5); // change to all 20 later
+        if (rand == 0) {
+            noiseMap[x,y] = 1;
+        }
+        else if (rand == 1) {
+            noiseMap[x,y] = 1;
+            noiseMap[x-1,y+1] = 1;
+        }
+        else if (rand == 2) {
+            noiseMap[x,y] = 1;
+            noiseMap[x+1,y+1] = 1;
+        }
+        else if (rand == 3) {
+            noiseMap[x,y] = 1;
+            noiseMap[x+1,y] = 1;
+        }
+        else if (rand == 4) {
+            noiseMap[x,y] = 1;
+            noiseMap[x+1,y+1] = 1;
+        }
+        return noiseMap;
+    }
 }
