@@ -85,53 +85,147 @@ public static class Noise {
         return noiseMap;
 	}
 
-    public static float[,] GenerateCoralMap(int chunkSize, float[,] hueMap, int seed, float scale, float frequency, Vector2 center) {
-        float[,] noiseMap = new float[chunkSize, chunkSize];
-        // generate chunks of coral (squares? circles?) with one color, all across the ocean where the huemap makes it green
-        // run completely random filters over the chunks, more filters where there is less green, several times, generating blocks of coral with the same color and increasing density towards the center
-        // use the int[,] in chunkgenerator to get the color from the array and apply it to that point
-        // apply noise filter to the coral as well?
-        System.Random prng = new System.Random(seed - 2);
-        float centerX = prng.Next(-10000, 10000) + center.x;
-        float centerY = prng.Next(-10000, 10000) + center.y;
-        float halfSize = chunkSize / 2f;
-        for (int y = 0; y < chunkSize; y++) {
-            for (int x = 0; x < chunkSize; x++) {
-                hueMap[x,y] = hueMap[x,y] < 0 ? 0 : hueMap[x,y];
-                if (prng.Next(100) <= 10 * hueMap[x,y]) {
-                    noiseMap = GenerateCoralShape(noiseMap, x, y, seed);
-                }
-                // float sampleX = (((x - halfSize + centerX) / scale) * frequency);
-                // float sampleY = (((y - halfSize + centerY) / scale) * frequency);
-                // float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
-                // noiseMap[x,y] = perlinValue;
-            }
-        }
-        return noiseMap;
-    }
+    // public static int[,] GenerateCoralMap(int chunkSize, float[,] hueMap, int seed, int spawnChance, Vector2 center) {
+    //     int[,] noiseMap = new int[chunkSize, chunkSize];
+    //     System.Random prng = new System.Random(seed - 2);
+    //     float centerX = prng.Next(-10000, 10000) + center.x;
+    //     float centerY = prng.Next(-10000, 10000) + center.y;
+    //     float halfSize = chunkSize / 2f;
+    //     for (int y = 0; y < chunkSize; y++) {
+    //         for (int x = 0; x < chunkSize; x++) {
+    //             if (prng.Next(1000) <= spawnChance * (hueMap[x,y] - 0.25f)) {
+    //                 noiseMap = GenerateCoralShape(noiseMap, x, y, seed, prng);
+    //                 // make clusters
+    //                 // perlin noise the clusters but have a much heigher tolerance 
+    //             }
+    //         }
+    //     }
+    //     return noiseMap;
+    // }
 
-    private static float[,] GenerateCoralShape(float[,] noiseMap, int x, int y, int seed) {
-        System.Random prng = new System.Random(seed + 2);
-        int rand = prng.Next(5); // change to all 20 later
-        if (rand == 0) {
-            noiseMap[x,y] = 1;
-        }
-        else if (rand == 1) {
-            noiseMap[x,y] = 1;
-            noiseMap[x-1,y+1] = 1;
-        }
-        else if (rand == 2) {
-            noiseMap[x,y] = 1;
-            noiseMap[x+1,y+1] = 1;
-        }
-        else if (rand == 3) {
-            noiseMap[x,y] = 1;
-            noiseMap[x+1,y] = 1;
-        }
-        else if (rand == 4) {
-            noiseMap[x,y] = 1;
-            noiseMap[x+1,y+1] = 1;
-        }
-        return noiseMap;
-    }
+    // private static int[,] GenerateCoralShape(int[,] noiseMap, int x, int y, int seed, System.Random prng) {
+    //     int rand = prng.Next(18);
+    //     int colorToUse = prng.Next(1, 6);
+    //     try { 
+    //         if (rand == 0) {
+    //             noiseMap[x,y] = colorToUse;
+    //             // 1 dot
+    //         }
+    //         else if (rand == 1) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x-1,y+1] = colorToUse;
+    //             // left diagonal 2
+    //         }
+    //         else if (rand == 2) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x+1,y+1] = colorToUse;
+    //             // diagonal 2
+    //         }
+    //         else if (rand == 3) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x-1,y+1] = colorToUse;
+    //             noiseMap[x-1,y-1] = colorToUse;
+    //             // left c 
+    //         }
+    //         else if (rand == 4) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x+1,y+1] = colorToUse;
+    //             noiseMap[x+1,y-1] = colorToUse;
+    //             // right c 
+    //         }
+    //         else if (rand == 5) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x-1,y+1] = colorToUse;
+    //             noiseMap[x+1,y+1] = colorToUse;
+    //             // up c 
+    //         }
+    //         else if (rand == 6) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x+1,y-1] = colorToUse;
+    //             noiseMap[x-1,y-1] = colorToUse;
+    //             // down c 
+    //         }
+    //         else if (rand == 7) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x+1,y] = colorToUse;
+    //             // horizontal 2
+    //         }
+    //         else if (rand == 8) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x+1,y] = colorToUse;
+    //             noiseMap[x+2,y] = colorToUse;
+    //             // horizontal 3
+    //         }
+    //         else if (rand == 9) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x+1,y] = colorToUse;
+    //             noiseMap[x+2,y] = colorToUse;
+    //             noiseMap[x+3,y] = colorToUse;
+    //             // horizontal 4
+    //         }
+    //         else if (rand == 10) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x+1,y] = colorToUse;
+    //             noiseMap[x+1,y+1] = colorToUse;
+    //             noiseMap[x+2,y] = colorToUse;
+    //             noiseMap[x+2,y-1] = colorToUse;
+    //             noiseMap[x+3,y] = colorToUse;
+    //             // fancy horizontal 4
+    //         }
+    //         else if (rand == 11) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x,y+1] = colorToUse;
+    //             // vertical 2
+    //         }
+    //         else if (rand == 12) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x,y+1] = colorToUse;
+    //             noiseMap[x,y+2] = colorToUse;
+    //             // vertical 3
+    //         }
+    //         else if (rand == 13) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x,y+1] = colorToUse;
+    //             noiseMap[x,y+2] = colorToUse;
+    //             noiseMap[x,y+3] = colorToUse;
+    //             // vertical 4
+    //         }
+    //         else if (rand == 14) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x,y+1] = colorToUse;
+    //             noiseMap[x+1,y+1] = colorToUse;
+    //             noiseMap[x,y+2] = colorToUse;
+    //             noiseMap[x-1,y+2] = colorToUse;
+    //             noiseMap[x,y+3] = colorToUse;
+    //             // fancy vertical 4
+    //         }
+    //         else if (rand == 15) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x,y+1] = colorToUse;
+    //             noiseMap[x+1,y] = colorToUse;
+    //             noiseMap[x+1,y+1] = colorToUse;
+    //             // 2x2 square
+    //         }
+    //         else if (rand == 16) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x+2,y] = colorToUse;
+    //             noiseMap[x,y+2] = colorToUse;
+    //             noiseMap[x+2,y+2] = colorToUse;
+    //             // 4 corners
+    //         }
+    //         else if (rand == 17) {
+    //             noiseMap[x,y] = colorToUse;
+    //             noiseMap[x,y+1] = colorToUse;
+    //             noiseMap[x+1,y+2] = colorToUse;
+    //             noiseMap[x+2,y+2] = colorToUse;
+    //             noiseMap[x+3,y+1] = colorToUse;
+    //             noiseMap[x+3,y] = colorToUse;
+    //             noiseMap[x+2,y-1] = colorToUse;
+    //             noiseMap[x+1,y-1] = colorToUse;
+    //             // cutout
+    //         }
+    //     }
+    //     catch {}
+    //     return noiseMap;
+    // }
 }
