@@ -25,10 +25,16 @@ public class MapGenerator : MonoBehaviour {
     // whether or not to apply the hue (green/blue) regions onto the map
     public float hueStrength;
     // the strength of the hue to apply, bigger number is smaller effect
+    public bool applyDither;
+    // whether or not to apply dithering to the map
+    public float ditherStrength;
+    // the strength of the dither to apply, bigger number is smaller effect
     public TerrainType[] regions;
     // array of structure which manages the colors applied to varying heights
     private float[,] hueMap;
     // float array representing the hue map
+    private float[,] ditherMap;
+    // float array representing the dither map
     private Vector2 origin = new Vector2(0.5f, 0.5f);
     // pivot point to give sprites a pivot at their center
     public Vector2 center;
@@ -37,11 +43,10 @@ public class MapGenerator : MonoBehaviour {
     // list of created chunks
     public GameObject centerChunk;
 
-	public GameObject GenerateChunkAt(Vector2 center) {
+	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
         if (applyHueRegions) { hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center); }
-        // print("finished hue");
+        if (applyDither) { ditherMap = Noise.GenerateDitherMap(chunkSize, seed, center, ditherStrength); }
 		float[,] noiseMap = Noise.GenerateNoiseMap(chunkSize, seed, noiseScale, octaves, persistence, lacunarity, center);
-        // print("finished noise map");
         // generate the noise map with the given variables
         Color[] colorMap = new Color[chunkSize * chunkSize];
         // make a new colormap to apply colors to
@@ -62,6 +67,12 @@ public class MapGenerator : MonoBehaviour {
                             // get the HSV variables from the color
                             newColor = Color.HSVToRGB(H - hueMap[x, y]/hueStrength, S, V);
                             // use the hsv variables to create a new color, but with modified hue (make it more green or blue)
+                        }
+                        if (applyDither) {
+                            Color.RGBToHSV(newColor, out H, out S, out V);
+                            // get the HSV variables from the color
+                            newColor = Color.HSVToRGB(H, S + ditherMap[x,y] / 2, V + ditherMap[x,y]);
+                            // use the hsv variables to create a new color, but with modified saturation and value
                         }
                         colorMap[y * chunkSize + x] = newColor;
                         // assign the color at given point to the colormap
@@ -84,8 +95,10 @@ public class MapGenerator : MonoBehaviour {
         // apply it
         GameObject newChunk = Instantiate(mapPrefab, center, Quaternion.identity);
         // instantiate a new chunk gameobject
-        // foreach(GameObject chunk in chunks) { DestroyImmediate(chunk); }
-        // chunks.Clear();
+        if (removeExisting) { 
+            foreach(GameObject chunk in chunks) { DestroyImmediate(chunk); }
+            chunks.Clear();
+        }
         newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
         chunks.Add(newChunk);
         // create a sprite from the chunk

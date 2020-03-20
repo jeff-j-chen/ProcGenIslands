@@ -63,18 +63,18 @@ public class ChunkLoader : MonoBehaviour {
     }
 
     private bool PlayerIsInChunk(GameObject chunk) {
-        return chunk.transform.position.x - 50 < player.transform.position.x && player.transform.position.x < chunk.transform.position.x + 50 && chunk.transform.position.y - 50 < player.transform.position.y && player.transform.position.y < chunk.transform.position.y + 50;
+        return chunk.transform.position.x - 25f < player.transform.position.x && player.transform.position.x < chunk.transform.position.x + 25f && chunk.transform.position.y - 25f < player.transform.position.y && player.transform.position.y < chunk.transform.position.y + 25f;
     }
 
     private void GenerateNewTestPositions() {
         testPositions.Clear();
-        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x - 100f, mapGenerator.centerChunk.transform.position.y + 100f));
-        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x, mapGenerator.centerChunk.transform.position.y + 100f));
-        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x + 100f, mapGenerator.centerChunk.transform.position.y + 100f));
-        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x - 100f, mapGenerator.centerChunk.transform.position.y));
-        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x + 100f, mapGenerator.centerChunk.transform.position.y));
-        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x - 100f, mapGenerator.centerChunk.transform.position.y - 100f));
-        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x, mapGenerator.centerChunk.transform.position.y - 100f));
-        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x + 100f, mapGenerator.centerChunk.transform.position.y - 100f));
+        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x - 50f, mapGenerator.centerChunk.transform.position.y + 50f));
+        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x, mapGenerator.centerChunk.transform.position.y + 50f));
+        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x + 50f, mapGenerator.centerChunk.transform.position.y + 50f));
+        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x - 50f, mapGenerator.centerChunk.transform.position.y));
+        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x + 50f, mapGenerator.centerChunk.transform.position.y));
+        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x - 50f, mapGenerator.centerChunk.transform.position.y - 50f));
+        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x, mapGenerator.centerChunk.transform.position.y - 50f));
+        testPositions.Add(new Vector2(mapGenerator.centerChunk.transform.position.x + 50f, mapGenerator.centerChunk.transform.position.y - 50f));
     }
 }
