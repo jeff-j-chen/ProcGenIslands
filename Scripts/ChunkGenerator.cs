@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class MapGenerator : MonoBehaviour {
+public class ChunkGenerator : MonoBehaviour {
     public GameObject mapPrefab;
     // the gameobject sprite prefab we are creating
 	public int chunkSize;
@@ -42,6 +42,8 @@ public class MapGenerator : MonoBehaviour {
     public List<GameObject> chunks = new List<GameObject>();
     // list of created chunks
     public GameObject centerChunk;
+    public Color[] coralColors = new Color[5];
+    // pink purple yellow red blue
 
 	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
         if (applyHueRegions) { hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center); }

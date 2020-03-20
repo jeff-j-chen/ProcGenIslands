@@ -27,6 +27,6 @@ public class Player : MonoBehaviour {
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        FindObjectOfType<MapGenerator>().centerChunk = other.gameObject;
+        FindObjectOfType<ChunkGenerator>().centerChunk = other.gameObject;
     }
 }
