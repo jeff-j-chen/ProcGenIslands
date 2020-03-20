@@ -32,11 +32,12 @@ public class MapGenerator : MonoBehaviour {
     private Vector2 origin = new Vector2(0.5f, 0.5f);
     // pivot point to give sprites a pivot at their center
     public Vector2 center;
-    // temp
-    public List<GameObject> chunks;
+    // the center where to spawn the chunk at
+    public List<GameObject> chunks = new List<GameObject>();
     // list of created chunks
+    public GameObject centerChunk;
 
-	public void GenerateChunkAt(Vector2 center) {
+	public GameObject GenerateChunkAt(Vector2 center) {
         if (applyHueRegions) { hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center); }
         // print("finished hue");
 		float[,] noiseMap = Noise.GenerateNoiseMap(chunkSize, seed, noiseScale, octaves, persistence, lacunarity, center);
@@ -88,6 +89,7 @@ public class MapGenerator : MonoBehaviour {
         newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
         chunks.Add(newChunk);
         // create a sprite from the chunk
+        return newChunk;
 	}
 
 	void OnValidate() {
