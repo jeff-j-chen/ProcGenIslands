@@ -2,54 +2,44 @@
 
 public class Player : MonoBehaviour {
     public int viewDist;
-    public float playerSpeed;
-    public bool touchingWater = false;
-    public Rigidbody2D rb;
     Vector2 movement;
     public float maxSpeed;
+    public float moveIncreaseRate;
+    public float moveVel;
+    public float rotSpeed;
+    public float curRotSpeed;
+    public float rotVelDecay;
    
-    private void FixedUpdate() {
-        // rudimentary player to test movement
-
-        if (touchingWater == false)
-        {
-            rb.velocity = new Vector2(movement.x * playerSpeed, rb.velocity.y);
-            rb.MovePosition(rb.position + movement * playerSpeed * Time.fixedDeltaTime);
+    private void Update() {
+        if (Input.GetKey(KeyCode.UpArrow)) {
+            moveVel += 0.1f * moveIncreaseRate;
+            moveVel = moveVel > maxSpeed ? maxSpeed : moveVel;
         }
-        if (touchingWater == true)
-        {
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                maxSpeed = maxSpeed < 50 ? maxSpeed + 25 : maxSpeed;
-                GetComponent<Rigidbody2D>().AddForce(new Vector2(maxSpeed, 0f));
-            }
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                maxSpeed = maxSpeed < 50 ? maxSpeed + 25 : maxSpeed;
-                GetComponent<Rigidbody2D>().AddForce(new Vector2(-maxSpeed, 0f));
-            }
-            if (Input.GetKey(KeyCode.UpArrow))
-            {
-                maxSpeed = maxSpeed < 50 ? maxSpeed + 25 : maxSpeed;
-                GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, maxSpeed));
-            }
-            if (Input.GetKey(KeyCode.DownArrow))
-            {
-                maxSpeed = maxSpeed < 50 ? maxSpeed + 25 : maxSpeed;
-                GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, -maxSpeed));
-            }
-            if (Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-            }
+        else if (Input.GetKey(KeyCode.DownArrow)) {
+            moveVel -= 0.075f * moveIncreaseRate;
+            moveVel = moveVel < -maxSpeed / 3 ? -maxSpeed / 3 : moveVel;
+        }
+        if (moveVel > 0f) { moveVel -= 0.05f * moveIncreaseRate; }
+        else { moveVel += 0.05f * moveIncreaseRate; }
+        if (-0.02f <= moveVel && moveVel <= 0.02f) { moveVel = 0f; }
+        if (Input.GetKey(KeyCode.RightArrow)) {
+            curRotSpeed = -rotSpeed;
+            if (moveVel > 0f) { moveVel -= rotVelDecay * moveIncreaseRate; }
+            else { moveVel += rotVelDecay * moveIncreaseRate; }
+        }
+        else if (Input.GetKey(KeyCode.LeftArrow)) {
+            curRotSpeed = rotSpeed;
+            if (moveVel > 0f) { moveVel -= rotVelDecay * moveIncreaseRate; }
+            else { moveVel += rotVelDecay * moveIncreaseRate; }
+        }
+        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow)) {
+            curRotSpeed = 0f;
         }
     }
 
-    private void Update()
-    {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
-        
+    private void FixedUpdate() {
+        transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z + curRotSpeed);
+        transform.GetComponent<Rigidbody2D>().velocity = new Vector2(moveVel * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f), moveVel * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f));
     }
 
     public bool PointInViewDist(Vector2 point) {
