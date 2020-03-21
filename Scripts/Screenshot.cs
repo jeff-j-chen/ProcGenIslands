@@ -52,8 +52,6 @@ public class Screenshot : MonoBehaviour {
             screenshotBorder.transform.parent = transform;
             screenshotBorder.transform.localPosition = new Vector3(0f, 0f, 10f);
             // same deal
-            screenshotBorder.GetComponent<SpriteRenderer>().sortingOrder = 4;
-            // high sorting order
             StartCoroutine(ScreenshotAnimation(takenScreenshot, screenshotBorder));
             // start coroutine for a simple animation
         }
@@ -77,6 +75,12 @@ public class Screenshot : MonoBehaviour {
         // change to normal, so it flashes black-white-normal 
         yield return new WaitForSeconds(0.75f);
         // show picture on screen for a time
+        for (int i = 0; i < 20; i++) {
+            takenScreenshot.transform.localScale = new Vector3(takenScreenshot.transform.localScale.x - 0.003333f / 2f, takenScreenshot.transform.localScale.y  - 0.003333f / 2f, takenScreenshot.transform.localScale.z);
+            screenshotBorder.transform.localScale = new Vector3(screenshotBorder.transform.localScale.x - 0.134f / 2f, screenshotBorder.transform.localScale.y - 0.134f / 2f, screenshotBorder.transform.localScale.z);
+            yield return new WaitForSeconds(0.025f / 2f);
+        }
+        // scale the screenshot and border down over the course of 0.25s
         Destroy(takenScreenshot);
         Destroy(screenshotBorder);
         // destroy both gameobjects

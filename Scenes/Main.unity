@@ -265,7 +265,7 @@ MonoBehaviour:
   moveVel: 0
   rotSpeed: 3
   curRotSpeed: 0
-  rotVelDecay: 0.075
+  rotVelDecay: 1.015
 --- !u!61 &464161842
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -769,6 +769,7 @@ MonoBehaviour:
   borderPrefab: {fileID: 4563948247473237638, guid: 037d9aa6d3612f9418d0ebf7e9785903,
     type: 3}
   myCamera: {fileID: 0}
+  lockScreenshot: 0
 --- !u!111 &956595686
 Animation:
   m_ObjectHideFlags: 0
