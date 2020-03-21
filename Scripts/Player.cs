@@ -2,13 +2,19 @@
 
 public class Player : MonoBehaviour {
     public int viewDist;
-    Vector2 movement;
+    // how fat away to load chunks
     public float maxSpeed;
+    // the maximum speed of the player
     public float moveIncreaseRate;
+    // how much to increase the player's movement velocity by
     public float moveVel;
+    // the player's current movement velocity
     public float rotSpeed;
+    // how fast the player should turn
     public float curRotSpeed;
+    // the player's current rotation speed
     public float rotVelDecay;
+    // how much the player's movement velocity should decay from moving
    
     private void Update() {
         // increase the movement velocity when the up/down key is held, up to a cap
@@ -28,19 +34,20 @@ public class Player : MonoBehaviour {
         // set the rotation speed when the left/right key is held, and decay movement velocity
         if (Input.GetKey(KeyCode.RightArrow)) {
             curRotSpeed = -rotSpeed;
-            if (moveVel > 0f) { moveVel -= rotVelDecay * moveIncreaseRate; }
-            else { moveVel += rotVelDecay * moveIncreaseRate; }
+            moveVel /= rotVelDecay;
+            // set rotation and decay movement velocity by a %
         }
         else if (Input.GetKey(KeyCode.LeftArrow)) {
             curRotSpeed = rotSpeed;
-            if (moveVel > 0f) { moveVel -= rotVelDecay * moveIncreaseRate; }
-            else { moveVel += rotVelDecay * moveIncreaseRate; }
+            moveVel /= rotVelDecay;
         }
         if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow)) {
             curRotSpeed = 0f;
             // upon release of left/right, remove all rotational speed
         }
     }
+
+    // reduce speed by % on rotation rather than by flat number
 
     private void FixedUpdate() {
         // called a certain # of times per second, rather than per frame
