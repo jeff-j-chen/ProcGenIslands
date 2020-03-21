@@ -1,69 +1,107 @@
 ﻿using System.Collections;
 using UnityEngine;
-public class Screenshot : MonoBehaviour {
-    private static Screenshot instance;
-    private Camera myCamera;
-    private bool takeScreenshotOnNextFrame;
-    public SpriteRenderer onscreen;
-    public string screenShotName = "CameraScreenshot.png";
-    int width = Screen.width;   // for Taking Picture
-    int height = Screen.height;
-    Texture2D screenshot;
-    Texture2D LoadScreenshot;
+using System;
 
-    public void Awake() {
-        instance = this;
+public class Screenshot : MonoBehaviour {
+    public GameObject screenshotPrefab;
+    public GameObject borderPrefab;
+    public Camera myCamera;
+    private bool takeScreenShotOnNextFrame;
+    int width;
+    int height;
+    private SpriteRenderer myRenderer;
+    private Shader shaderGUItext;
+    private Shader shaderSpritesDefault;
+    public bool lockScreenshot = false;
+    private void Start() {
         myCamera = GetComponent<Camera>();
-        onscreen = GetComponentInChildren<SpriteRenderer>();
-        onscreen.enabled = true;
+        // set the camera
     }
 
     private void OnPostRender() {
-        if (takeScreenshotOnNextFrame) {
-            takeScreenshotOnNextFrame = false;
-            RenderTexture renderTexture = myCamera.targetTexture;
-            Texture2D renderResult = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.ARGB32, false);
-            Rect rect = new Rect(0, 0, renderTexture.width, renderTexture.height);
-            renderResult.ReadPixels(rect, 0, 0);
-            byte[] byteArray = renderResult.EncodeToPNG();
-            System.IO.File.WriteAllBytes(Application.dataPath + "/CameraScreenshot.png", byteArray);
-            Debug.Log("Save CameraScreenshot.png");
-            RenderTexture.ReleaseTemporary(renderTexture);
-            myCamera.targetTexture = null;
-            this.LoadImage();
-            
+        // called after a frame has been rendered
+        if (takeScreenShotOnNextFrame) {
+            // if taking a screenshot next frame
+            takeScreenShotOnNextFrame = false;
+            // set to false the next frame
+            Texture2D texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
+            // generate a new texture
+            texture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            // read the pixels of the texture
+            byte[] byteArray = texture.EncodeToPNG();
+            DateTime dateTime = DateTime.Now;
+            System.IO.File.WriteAllBytes(System.IO.Directory.GetCurrentDirectory() + $"/{dateTime.Year}-{dateTime.Month}-{dateTime.Day}_{dateTime.Hour}.{dateTime.Minute}.{dateTime.Second}.png", byteArray);
+            // encode the texture to png and save it with the datetime
+            // now create sprite
+            texture.Apply();
+            // apply texture
+            texture.filterMode = FilterMode.Point;
+            // point filter (not bilinear)
+            texture.wrapMode = TextureWrapMode.Clamp;
+            // clamp (not wrap)
+            GameObject takenScreenshot = Instantiate(screenshotPrefab, new Vector2(0f, 0f), Quaternion.identity);
+            // instantiate the taken screenshot
+            takenScreenshot.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 1f, 0u, SpriteMeshType.FullRect);
+            // make the texture in to a sprite, and give it to the screenshot object
+            takenScreenshot.transform.parent = transform;
+            // parent the screenshot to the camera (so it follows it around)
+            takenScreenshot.transform.localPosition = new Vector3(0f, 0f, 10f);
+            // localposition with z of 10, so it's not right on the camera
+            GameObject screenshotBorder = Instantiate(borderPrefab, new Vector2(0f, 0f), Quaternion.identity);
+            // create the border 
+            screenshotBorder.transform.parent = transform;
+            screenshotBorder.transform.localPosition = new Vector3(0f, 0f, 10f);
+            // same deal
+            screenshotBorder.GetComponent<SpriteRenderer>().sortingOrder = 4;
+            // high sorting order
+            StartCoroutine(ScreenshotAnimation(takenScreenshot, screenshotBorder));
+            // start coroutine for a simple animation
         }
     }
-    
-    private void TakeScreenShot(int width, int height) {
-        myCamera.targetTexture = RenderTexture.GetTemporary(width, height, 16);
-        takeScreenshotOnNextFrame = true;
-        
-        onscreen.enabled = false;
 
-        StartCoroutine(WaitOnScreen());
+    public IEnumerator ScreenshotAnimation(GameObject takenScreenshot, GameObject screenshotBorder) {
+        shaderGUItext = Shader.Find("GUI/Text Shader");
+        shaderSpritesDefault = Shader.Find("Sprites/Default");
+        // get various shaders
+        print("screen capture noise");
+        takenScreenshot.GetComponent<SpriteRenderer>().color = Color.black;
+        // set to black
+        yield return new WaitForSeconds(0.1f);
+        // wait tiny bit
+        takenScreenshot.GetComponent<SpriteRenderer>().color = Color.white;
+        takenScreenshot.GetComponent<SpriteRenderer>().material.shader = shaderGUItext;
+        // set to white
+        yield return new WaitForSeconds(0.05f);
+        // wait tiny bit
+        takenScreenshot.GetComponent<SpriteRenderer>().material.shader = shaderSpritesDefault;
+        // change to normal, so it flashes black-white-normal 
+        yield return new WaitForSeconds(0.75f);
+        // show picture on screen for a time
+        Destroy(takenScreenshot);
+        Destroy(screenshotBorder);
+        // destroy both gameobjects
     }
 
-    public static void TakeScreenShot_Static(int width, int height) {
-        instance.TakeScreenShot(width, height);
+    public void TakeScreenShot(int passedWidth, int passedHeight) {
+        width = passedWidth;
+        height = passedHeight;
+        takeScreenShotOnNextFrame = true;
+        // specify height and width (maybe used later), let the camera know to take a screenshot next frame
     }
 
-    public void LoadImage() {
-        string path = Application.persistentDataPath + "/" + screenShotName;
-        byte[] bytes;
-        bytes = System.IO.File.ReadAllBytes(path);
-        LoadScreenshot = new Texture2D(4, 4);
-        LoadScreenshot.LoadImage(bytes);
-        Sprite sprite = Sprite.Create(screenshot, new Rect(0, 0, width, height), new Vector2(0.5f, 0.0f), 1.0f);
-
-        GameObject.Find("Picture").GetComponent<SpriteRenderer>().sprite = sprite;
-
-        Debug.Log("LOAD IMAGE");
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            // take screenshot when space is pressed
+            if (!lockScreenshot) { 
+                lockScreenshot = true;
+                StartCoroutine(UnlockScreenshot());
+                TakeScreenShot(800, 600); 
+            }
+        }
     }
 
-    IEnumerator WaitOnScreen() {
-        yield return new WaitForSeconds(1f);
-        onscreen.enabled = true;
+    public IEnumerator UnlockScreenshot() {
+        yield return new WaitForSeconds(1.5f);
+        lockScreenshot = false;
     }
-
 }
