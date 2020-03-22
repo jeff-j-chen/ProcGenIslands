@@ -672,7 +672,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dateText: {fileID: 36451749}
   _changeTimer: 0.001
-  hour: 0
+  hour: 1
   day: 1
   dayColors:
   - {r: 0.2509804, g: 0.1254902, b: 0, a: 0.2509804}

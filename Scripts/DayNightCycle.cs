@@ -8,7 +8,7 @@ public class DayNightCycle : MonoBehaviour {
     public TextMeshProUGUI dateText;
     public float _changeTimer;
     private WaitForSeconds changeTimer;
-    public float hour = 7;
+    public float hour = 1;
     public int day = 1;
     public List<Color> dayColors;
 
@@ -23,7 +23,7 @@ public class DayNightCycle : MonoBehaviour {
     private IEnumerator MoveThroughTime() {
         while (true) {
             int flooredHour = Mathf.FloorToInt(hour);
-            if (hour > dayColors.Count) { hour = 0f; }
+            if (hour > 25) { hour = 1f; }
             if (flooredHour < dayColors.Count - 1) {
                 GetComponent<SpriteRenderer>().color = Color.Lerp(dayColors[flooredHour], dayColors[flooredHour + 1], hour - flooredHour);
             }
@@ -32,7 +32,7 @@ public class DayNightCycle : MonoBehaviour {
             }
             hour += _changeTimer;
             if (Mathf.Abs(flooredHour - hour) <= 0.1) {
-                if (flooredHour + 1 <= 12) { dateText.text = $"Day {day}, {flooredHour} AM"; } 
+                if (flooredHour <= 12) { dateText.text = $"Day {day}, {flooredHour} AM"; } 
                 else { dateText.text = $"Day {day}, {flooredHour - 12} PM"; } 
             }
             yield return changeTimer;
