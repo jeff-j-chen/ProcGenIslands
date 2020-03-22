@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Player : MonoBehaviour {
     public int viewDist;
@@ -15,6 +16,22 @@ public class Player : MonoBehaviour {
     // the player's current rotation speed
     public float rotVelDecay;
     // how much the player's movement velocity should decay from moving
+    public GameObject waterParticle;
+    // the water particle prefab to spawn in on player move
+    public float particleLifetime;
+    // how long (in seconds) each particle should live
+    private WaitForSeconds lifetime;
+    // waitforseconds for the lifetime
+    public float randOffset;
+    // how much to offset the float particles by
+    public float particleSpeed;
+    // how fast to send the particles backwards
+    public float spawnChance;
+    // the chance for a particle to spawn
+
+    private void Start() {
+        lifetime = new WaitForSeconds(particleLifetime);
+    }
    
     private void Update() {
         // increase the movement velocity when the up/down key is held, up to a cap
@@ -47,14 +64,27 @@ public class Player : MonoBehaviour {
         }
     }
 
+    public void InstaniateParticle() {
+        GameObject createdParticle = Instantiate(waterParticle, new Vector2(transform.position.x + (Random.value * 2 - 1) * randOffset, transform.position.y + (Random.value * 2 - 1) * randOffset), Quaternion.identity);
+        StartCoroutine(DestroyParticle(createdParticle));
+        createdParticle.GetComponent<Rigidbody2D>().velocity = new Vector2(-particleSpeed * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f  + (Random.value * 2 - 1) * randOffset), -particleSpeed * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f + (Random.value * 2 - 1) * randOffset));
+    }
+
+    public IEnumerator DestroyParticle(GameObject particle) {
+        yield return lifetime;
+        Destroy(particle);
+    }
     // reduce speed by % on rotation rather than by flat number
 
     private void FixedUpdate() {
         // called a certain # of times per second, rather than per frame
         transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z + curRotSpeed);
         // create a new euler angle based on the rotation input
-        transform.GetComponent<Rigidbody2D>().velocity = new Vector2(moveVel * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f), moveVel * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f));
+        GetComponent<Rigidbody2D>().velocity = new Vector2(moveVel * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f), moveVel * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f));
         // create a vector based on the movement velocity and angle, then apply it to the rigidbody
+        if (UnityEngine.Random.Range(1, spawnChance) <= Mathf.Abs(Mathf.RoundToInt(moveVel))) {
+            InstaniateParticle();
+        }
     }
 
     public bool PointInViewDist(Vector2 point) {
