@@ -40,7 +40,7 @@ public static class Noise {
                     frequency *= lacunarity;
                     // modify the variables, watch sebastian lague's 1st terrain generation if you forget
 				}
-                noiseMap[x,y] = noiseHeight;
+                noiseMap[x,y] = Mathf.Clamp(noiseHeight, -1, 1);
                 // at [x,y] in the array, set the value to be that we just generated
 			}
 		}

@@ -27,13 +27,9 @@ public class ChunkGenerator : MonoBehaviour {
 	public bool autoUpdate;
     // whether or not to automatically update the map every time something changes
     [Header("Hue")]
-    public bool applyHueRegions;
-    // whether or not to apply the hue (green/blue) regions onto the map
     public float hueStrength;
     // the strength of the hue to apply, bigger number is smaller effect
     [Header("Dither")]
-    public bool applyDither;
-    // whether or not to apply dithering to the map
     public float ditherStrength;
     // the strength of the dither to apply, bigger number is smaller effect
     // float array representing the dither map
@@ -55,12 +51,17 @@ public class ChunkGenerator : MonoBehaviour {
     float[,] hueMap;
     float[,] ditherMap;
     int[,] coralMap;
+    private Rect chunkRect;
+
+    private void Start() {
+        chunkRect = new Rect(0, 0, chunkSize, chunkSize);
+    }
 
     
 	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
         // bool generateExtra = false;
-        if (applyHueRegions) { hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center); }
-        if (applyDither) { ditherMap = Noise.GenerateDitherMap(chunkSize, seed, center, ditherStrength); }
+        hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center);
+        ditherMap = Noise.GenerateDitherMap(chunkSize, seed, center, ditherStrength);
         // if (applyCoral) { coralMap = Noise.GenerateCoralMap(chunkSize, hueMap, seed, coralSpawnChance, center); }
 		float[,] noiseMap = Noise.GenerateNoiseMap(chunkSize, seed, noiseScale, octaves, persistence, lacunarity, center);
         // generate the noise map with the given variables
@@ -78,32 +79,18 @@ public class ChunkGenerator : MonoBehaviour {
                     if (currentHeight <= regions[i].height) {
                         // found the region that the point belongs to 
                         Color newColor = regions[i].color;
-                        // if (applyCoral && currentHeight <= 0.2 && coralMap[x,y] != 0) {
-                        //     generateExtra = true;
-                        //     // make it so that we generate the overlay chunk (remove later)
-                        //     Color.RGBToHSV(newColor, out H, out S, out float oldV);
-                        //     // get the current value of the water
-                        //     newColor = coralColors[coralMap[x,y] - 1];
-                        //     // assign the color to be that of the coral
-                        //     Color.RGBToHSV(newColor, out H, out S, out V);
-                        //     // get the new color's hsv
-                        //     newColor = Color.HSVToRGB(H, S, V - (1000 - 1000 * oldV) / coralFadeoffStrength);
-                        //     // set the new color with reduced value based on how dark the ocean was
-                        // }
-                        if (applyHueRegions && currentHeight <= 0.2 && hueMap[x, y] > 0) {
+                        if (currentHeight <= 0.2 && hueMap[x, y] > 0) {
                             Color.RGBToHSV(newColor, out H, out S, out V);
                             // get the HSV variables from the color
                             newColor = Color.HSVToRGB(H - hueMap[x, y]/hueStrength, S, V);
                             // use the hsv variables to create a new color, but with modified hue (make it more green or blue)
                         }
-                        if (applyDither) {
-                            Color.RGBToHSV(newColor, out H, out S, out V);
-                            // get the HSV variables from the color
-                            newColor = Color.HSVToRGB(H, S + ditherMap[x,y] / 2, V + ditherMap[x,y]);
-                            // use the hsv variables to create a new color, but with modified saturation and value
-                        }
-                        // assign the color at given point to the colormap
+                        Color.RGBToHSV(newColor, out H, out S, out V);
+                        // get the HSV variables from the color
+                        newColor = Color.HSVToRGB(H, S + ditherMap[x,y] / 2, V + ditherMap[x,y]);
+                        // use the hsv variables to create a new color, but with modified saturation and value
                         colorMap[y * chunkSize + x] = newColor;
+                        // assign the color at given point to the colormap
                         break;
                         // no need to check other regions, so break out
                     }
@@ -127,7 +114,12 @@ public class ChunkGenerator : MonoBehaviour {
         // remove any existing chunks if desired (used for editing in scene mode)
         GameObject newChunk = Instantiate(mapPrefab, center, Quaternion.identity);
         // instantiate a new chunk gameobject
-        newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
+        if (removeExisting) {
+            newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
+        }
+        else {
+            newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, chunkRect, origin, 1f, 0u, SpriteMeshType.FullRect);
+        }
         // create a sprite from the chunk
         chunks.Add(newChunk);
         // add it to the list
