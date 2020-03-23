@@ -87,7 +87,7 @@ public class Player : MonoBehaviour {
         // create a new euler angle based on the rotation input
         GetComponent<Rigidbody2D>().velocity = new Vector2(moveVel * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f), moveVel * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f));
         // create a vector based on the movement velocity and angle, then apply it to the rigidbody
-        if (UnityEngine.Random.Range(1, spawnChance) <= Mathf.Abs(Mathf.RoundToInt(moveVel))) {
+        if (UnityEngine.Random.Range(1, spawnChance) <= Mathf.Abs(Mathf.RoundToInt(moveVel)) + 1) {
             InstaniateParticle();
         }
         coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";

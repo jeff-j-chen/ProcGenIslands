@@ -26,7 +26,7 @@ public class ChunkLoader : MonoBehaviour {
 
     private void Awake() {
 
-        cloud = cloudGenerator.GenerateCloudAt(new Vector2(0, 0), cloud,1324324,50,1f,0f);
+        // cloud = cloudGenerator.GenerateCloudAt(new Vector2(0, 0), cloud,1324324,50,1f,0f);
         //cloud2 = cloudGenerator.GenerateCloudAt(new Vector2(0, 0),cloud2,10,50,-.2f,0f);
         // generate a cloud and store it
         chunkGenerator.GenerateChunkAt(new Vector2(0, 0));
@@ -42,11 +42,6 @@ public class ChunkLoader : MonoBehaviour {
 
     private IEnumerator UpdateChunks() { 
         while (true) {
-            //int randomVal = (int)Random.Range(-1f,1f);
-            //cloudGenerator.octaves += randomVal;
-            cloud = cloudGenerator.GenerateCloudAt(new Vector2(0, 0),cloud, 1324324, 50,1f,0f);
-           // cloud2 = cloudGenerator.GenerateCloudAt(new Vector2(0, 0),cloud2,10,50,0.05f, 0f);
-
             // repeat forever
             lastPlayerX = player.transform.position.x;
             lastPlayerY = player.transform.position.y;
@@ -64,8 +59,8 @@ public class ChunkLoader : MonoBehaviour {
                         // destroy the chunk at that position
                     }
                 } 
-                // get a list of the chunk positions
                 GenerateNewTestPositions();
+                // get a list of the chunk positions
                 for (int i = 0; i < testPositions.Count; i++) {
                     // for every test position (for i faster than foreach) 
                     if (!chunkPositions.Contains(testPositions[i]) && player.PointInViewDist(testPositions[i])) {
