@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using TMPro;
 
 public class Player : MonoBehaviour {
     public int viewDist;
@@ -28,6 +29,8 @@ public class Player : MonoBehaviour {
     // how fast to send the particles backwards
     public float spawnChance;
     // the chance for a particle to spawn
+    public GameObject minimapIcon;
+    public TextMeshProUGUI coordinates;
 
     private void Start() {
         lifetime = new WaitForSeconds(particleLifetime);
@@ -78,13 +81,16 @@ public class Player : MonoBehaviour {
 
     private void FixedUpdate() {
         // called a certain # of times per second, rather than per frame
-        transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z + curRotSpeed);
+        Vector3 newRotation = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z + curRotSpeed);
+        transform.eulerAngles = newRotation;
+        minimapIcon.transform.eulerAngles = newRotation;
         // create a new euler angle based on the rotation input
         GetComponent<Rigidbody2D>().velocity = new Vector2(moveVel * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f), moveVel * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f));
         // create a vector based on the movement velocity and angle, then apply it to the rigidbody
         if (UnityEngine.Random.Range(1, spawnChance) <= Mathf.Abs(Mathf.RoundToInt(moveVel))) {
             InstaniateParticle();
         }
+        coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
     }
 
     public bool PointInViewDist(Vector2 point) {
