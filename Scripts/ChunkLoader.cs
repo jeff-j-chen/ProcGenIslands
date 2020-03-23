@@ -6,6 +6,8 @@ using System.Linq;
 
 public class ChunkLoader : MonoBehaviour {
     public ChunkGenerator chunkGenerator;
+    public CloudGenerator cloudGenerator;
+    
     // mapgenerator object
     public float chunkUpdateDelay = 1f;
     // delay between chunk updates
@@ -13,12 +15,20 @@ public class ChunkLoader : MonoBehaviour {
     // assigned at runtime
     private Player player;
     // the player
+    public GameObject cloud;
+    public GameObject cloud2;
     private List<Vector2> chunkPositions = new List<Vector2>();
     private List<Vector2> testPositions = new List<Vector2>();
     private float lastPlayerX;
     private float lastPlayerY;
-    
+   
+
+
     private void Awake() {
+
+        cloud = cloudGenerator.GenerateCloudAt(new Vector2(0, 0), cloud,1324324,50,1f,0f);
+        //cloud2 = cloudGenerator.GenerateCloudAt(new Vector2(0, 0),cloud2,10,50,-.2f,0f);
+        // generate a cloud and store it
         chunkGenerator.GenerateChunkAt(new Vector2(0, 0));
         // generate a new chunk at the center (testing purposes only)
         waitTime = new WaitForSeconds(chunkUpdateDelay);
@@ -27,10 +37,16 @@ public class ChunkLoader : MonoBehaviour {
         // get the player object
         StartCoroutine(UpdateChunks());
         // start updating chunks
+
     }
 
     private IEnumerator UpdateChunks() { 
         while (true) {
+            //int randomVal = (int)Random.Range(-1f,1f);
+            //cloudGenerator.octaves += randomVal;
+            cloud = cloudGenerator.GenerateCloudAt(new Vector2(0, 0),cloud, 1324324, 50,1f,0f);
+           // cloud2 = cloudGenerator.GenerateCloudAt(new Vector2(0, 0),cloud2,10,50,0.05f, 0f);
+
             // repeat forever
             lastPlayerX = player.transform.position.x;
             lastPlayerY = player.transform.position.y;
