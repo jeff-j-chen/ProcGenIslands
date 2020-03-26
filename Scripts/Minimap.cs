@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class Minimap : MonoBehaviour {
     public int mapSize;
@@ -64,5 +63,4 @@ public class Minimap : MonoBehaviour {
         GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, mapSize, mapSize), origin, 1f, 0u, SpriteMeshType.FullRect);
         // create a sprite from the chunk
     }
-
 }

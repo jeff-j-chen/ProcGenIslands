@@ -1,8 +1,6 @@
-
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
 
 public class ChunkLoader : MonoBehaviour {
     public ChunkGenerator chunkGenerator;
@@ -21,8 +19,6 @@ public class ChunkLoader : MonoBehaviour {
     private List<Vector2> testPositions = new List<Vector2>();
     private float lastPlayerX;
     private float lastPlayerY;
-   
-
 
     private void Awake() {
 
