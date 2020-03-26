@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 public class ChunkLoader : MonoBehaviour {
     public ChunkGenerator chunkGenerator;
-    public CloudGenerator cloudGenerator;
-    
     // mapgenerator object
     public float chunkUpdateDelay = 1f;
     // delay between chunk updates
@@ -13,12 +11,12 @@ public class ChunkLoader : MonoBehaviour {
     // assigned at runtime
     private Player player;
     // the player
-    public GameObject cloud;
-    public GameObject cloud2;
     private List<Vector2> chunkPositions = new List<Vector2>();
     private List<Vector2> testPositions = new List<Vector2>();
+    // lists used for checking if we need to spawn a chunk at a location 
     private float lastPlayerX;
     private float lastPlayerY;
+    // floats telling us where the player was last, used to help performance
 
     private void Awake() {
         chunkGenerator.GenerateChunkAt(new Vector2(0, 0));
@@ -36,18 +34,24 @@ public class ChunkLoader : MonoBehaviour {
             // repeat forever
             lastPlayerX = player.transform.position.x;
             lastPlayerY = player.transform.position.y;
+            // get the player's last location
             yield return waitTime;
             if (lastPlayerX != player.transform.position.x || lastPlayerY != player.transform.position.y) {
-                // first check if playre has moved since last check
+                // first check if player has moved since last check, only then do we update
                 chunkPositions.Clear();
+                // clear the array in preparation for population
                 for (int i = 0; i < chunkGenerator.chunks.Count; i++) {
+                    // for every chunk that is in existence
                     chunkPositions.Add(new Vector2(chunkGenerator.chunks[i].transform.position.x, chunkGenerator.chunks[i].transform.position.y));
+                    // add the chunk's position to the array
                     if (!player.PointInViewDist(chunkPositions[i])) {
                         // if the chunk position is not within the player's viewing radius
                         chunkGenerator.chunks[i].GetComponent<SpriteRenderer>().sprite = null;
+                        // hide it
                         Destroy(chunkGenerator.chunks[i]);
+                        // destroy it
                         chunkGenerator.chunks.RemoveAt(i);
-                        // destroy the chunk at that position
+                        // remove it
                     }
                 } 
                 GenerateNewTestPositions();
@@ -65,10 +69,12 @@ public class ChunkLoader : MonoBehaviour {
     }
 
     private bool PlayerIsInChunk(GameObject chunk) {
+        // checks if a player is within the bounds of a chunk
         return chunk.transform.position.x - 25f < player.transform.position.x && player.transform.position.x < chunk.transform.position.x + 25f && chunk.transform.position.y - 25f < player.transform.position.y && player.transform.position.y < chunk.transform.position.y + 25f;
     }
 
     private void GenerateNewTestPositions() {
+        // makes a list of potential positions to spawn chunks in
         testPositions.Clear();
         testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x - 50f, chunkGenerator.centerChunk.transform.position.y + 50f));
         testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x, chunkGenerator.centerChunk.transform.position.y + 50f));

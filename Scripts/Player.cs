@@ -19,38 +19,29 @@ public class Player : MonoBehaviour {
     // how much the player's movement velocity should decay from moving
     public GameObject waterParticle;
     // the water particle prefab to spawn in on player move
-    public float particleLifetime;
+    public float _particleLifetime;
     // how long (in seconds) each particle should live
-    private WaitForSeconds lifetime;
-    // waitforseconds for the lifetime
+    private WaitForSeconds particleLifetime;
+    // waitforseconds for the particleLifetime
     public float randOffset;
     // how much to offset the float particles by
     public float particleSpeed;
     // how fast to send the particles backwards
     public float spawnChance;
     // the chance for a particle to spawn
+    public float limiter;
+    // when to clamp the movement velocity to 0
     public GameObject minimapIcon;
+    // the player's icon on the minimap
     public TextMeshProUGUI coordinates;
+    // textmeshpro object representing the player's coordinates
 
     private void Start() {
-        lifetime = new WaitForSeconds(particleLifetime);
+        particleLifetime = new WaitForSeconds(_particleLifetime);
+        // create the waitforseconds
     }
    
     private void Update() {
-        // increase the movement velocity when the up/down key is held, up to a cap
-        if (Input.GetKey(KeyCode.UpArrow)) {
-            moveVel += 0.1f * moveIncreaseRate;
-            moveVel = moveVel > maxSpeed ? maxSpeed : moveVel;
-        }
-        else if (Input.GetKey(KeyCode.DownArrow)) {
-            moveVel -= 0.075f * moveIncreaseRate;
-            moveVel = moveVel < -maxSpeed / 3 ? -maxSpeed / 3 : moveVel;
-        }
-        if (moveVel > 0f) { moveVel -= 0.05f * moveIncreaseRate; }
-        else { moveVel += 0.05f * moveIncreaseRate; }
-        // decay movement velocity towards 0
-        if (-0.02f <= moveVel && moveVel <= 0.02f) { moveVel = 0f; }
-        // and round it off to 0 when it gets close enough
         // set the rotation speed when the left/right key is held, and decay movement velocity
         if (Input.GetKey(KeyCode.RightArrow)) {
             curRotSpeed = -rotSpeed;
@@ -67,31 +58,52 @@ public class Player : MonoBehaviour {
         }
     }
 
-    public void InstaniateParticle() {
+    private void FixedUpdate() {
+        // called a certain # of times per second, rather than per frame. makes it so that movement is fair between computers that run the game at different framerates
+        // increase the movement velocity when the up/down key is held, up to a cap
+        if (Input.GetKey(KeyCode.UpArrow)) {
+            moveVel += 0.1f * moveIncreaseRate;
+            moveVel = moveVel > maxSpeed ? maxSpeed : moveVel;
+        }
+        else if (Input.GetKey(KeyCode.DownArrow)) {
+            moveVel -= 0.075f * moveIncreaseRate;
+            moveVel = moveVel < -maxSpeed / 3 ? -maxSpeed / 3 : moveVel;
+        }
+        if (-limiter <= moveVel && moveVel <= limiter) { moveVel = 0f; }
+        // instantly set movement velocity to 0 if within the limits (+- 0.1 works well)
+        else {
+            // don't clamp, so decrease it down to 0
+            if (moveVel > 0) { moveVel -= 0.05f * moveIncreaseRate; }
+            else { moveVel += 0.05f * moveIncreaseRate; }
+        }
+        Vector3 newRotation = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z + curRotSpeed);
+        // create a new euler angle based on the rotation input
+        transform.eulerAngles = newRotation;
+        minimapIcon.transform.eulerAngles = newRotation;
+        // assign the rotation to the player and the player's minimap icon
+        GetComponent<Rigidbody2D>().velocity = new Vector2(moveVel * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f), moveVel * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f));
+        // create a vector based on the movement velocity and angle, then apply it to the rigidbody
+        if (Random.Range(0, spawnChance) <= Mathf.Abs(Mathf.RoundToInt(moveVel)) + 1) {
+            InstantiateParticle();
+        }
+        // instantiate a particle based on player speed
+        coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
+        // update the coordinate text 
+    }
+    
+    public void InstantiateParticle() {
         GameObject createdParticle = Instantiate(waterParticle, new Vector2(transform.position.x + (Random.value * 2 - 1) * randOffset, transform.position.y + (Random.value * 2 - 1) * randOffset), Quaternion.identity);
         StartCoroutine(DestroyParticle(createdParticle));
-        createdParticle.GetComponent<Rigidbody2D>().velocity = new Vector2(-particleSpeed * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f  + (Random.value * 2 - 1) * randOffset), -particleSpeed * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f + (Random.value * 2 - 1) * randOffset));
+        if (moveVel != 0f) {
+            createdParticle.GetComponent<Rigidbody2D>().velocity = new Vector2(-particleSpeed * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f  + (Random.value * 2 - 1) * randOffset), -particleSpeed * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f + (Random.value * 2 - 1) * randOffset));
+        }
     }
 
     public IEnumerator DestroyParticle(GameObject particle) {
-        yield return lifetime;
+        yield return particleLifetime;
         Destroy(particle);
     }
-    // reduce speed by % on rotation rather than by flat number
 
-    private void FixedUpdate() {
-        // called a certain # of times per second, rather than per frame
-        Vector3 newRotation = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z + curRotSpeed);
-        transform.eulerAngles = newRotation;
-        minimapIcon.transform.eulerAngles = newRotation;
-        // create a new euler angle based on the rotation input
-        GetComponent<Rigidbody2D>().velocity = new Vector2(moveVel * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f), moveVel * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f));
-        // create a vector based on the movement velocity and angle, then apply it to the rigidbody
-        if (UnityEngine.Random.Range(1, spawnChance) <= Mathf.Abs(Mathf.RoundToInt(moveVel)) + 1) {
-            InstaniateParticle();
-        }
-        coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
-    }
 
     public bool PointInViewDist(Vector2 point) {
         return (Mathf.Sqrt(Mathf.Pow(transform.position.x - point.x, 2) + Mathf.Pow(transform.position.y - point.y, 2)) < viewDist);

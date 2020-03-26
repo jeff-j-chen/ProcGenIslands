@@ -32,14 +32,6 @@ public class ChunkGenerator : MonoBehaviour {
     public float ditherStrength;
     // the strength of the dither to apply, bigger number is smaller effect
     // float array representing the dither map
-    [Header("Coral")]
-    public bool applyCoral;
-    public Color[] coralColors = new Color[5];
-    // color array representing the possible coral colors
-    public int coralSpawnChance;
-    // the spawn chance for coral
-    public float coralFadeoffStrength;
-    // how much coral should fade in deeper waters
     [Header("Other")]
     public List<GameObject> chunks = new List<GameObject>();
     // list of created chunks

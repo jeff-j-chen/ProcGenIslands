@@ -373,17 +373,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewDist: 60
   maxSpeed: 20
-  moveIncreaseRate: 1.5
+  moveIncreaseRate: 1.8
   moveVel: 0
   rotSpeed: 3
   curRotSpeed: 0
-  rotVelDecay: 1.012
+  rotVelDecay: 1.008
   waterParticle: {fileID: 2759375057614108553, guid: 72b8408d8b55c8a49bab1ec1189c804e,
     type: 3}
-  particleLifetime: 0.7
+  _particleLifetime: 0.73
   randOffset: 0.5
   particleSpeed: 1
   spawnChance: 50
+  limiter: 0.1
   minimapIcon: {fileID: 1950656121}
   coordinates: {fileID: 1354377997}
 --- !u!61 &464161842

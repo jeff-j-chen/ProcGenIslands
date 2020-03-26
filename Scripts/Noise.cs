@@ -56,31 +56,46 @@ public static class Noise {
         }
         // limit the scale
 		System.Random prng = new System.Random(seed * 2);
+        // get the seed
         float offsetX = prng.Next(-10000, 10000);
         float offsetY = prng.Next(-10000, 10000);
+        // create offsets
         float halfSize = chunkSize / 2f;
+        // get the halfsize
         for (int y = 0; y < chunkSize; y++) {
             for (int x = 0; x < chunkSize; x++) {
+                // for every point (x, y)
                 float sampleX = (((x - halfSize + center.x) / scale) * frequency) + offsetX;
                 float sampleY = (((y - halfSize + center.y) / scale) * frequency) + offsetY;
+                // set the positions, taking into account scale, frequency, center, etc.
                 float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2f - 1f;
+                // get the perlin value at that poni
                 noiseMap[x,y] = perlinValue;
+                // assign (x,y)
 			}
 		}
         return noiseMap;
+        // return the created noisemap
 	}
 
     public static float[,] GenerateDitherMap(int chunkSize, int seed, Vector2 center, float ditherStrength) {
         float[,] noiseMap = new float[chunkSize, chunkSize];
+        // new float array
 		System.Random prng = new System.Random(seed / 2);
+        // get the seed
         float centerX = prng.Next(-10000, 10000) + center.x;
         float centerY = prng.Next(-10000, 10000) + center.y;
+        // get the centers
         float halfSize = chunkSize / 2f;
+        // get the halfsizes
         for (int y = 0; y < chunkSize; y++) {
             for (int x = 0; x < chunkSize; x++) {
-                noiseMap[x,y] = ((float)prng.NextDouble() * 2f + 1f)/ditherStrength;
+                // for every point (x, y)
+                noiseMap[x,y] = ((float)prng.NextDouble() * 2f + 1f) / ditherStrength;
+                // get a random float from -1 to 1, and divide by ditherstrength
 			}
 		}
         return noiseMap;
+        // return the created noisemap
 	}
 }

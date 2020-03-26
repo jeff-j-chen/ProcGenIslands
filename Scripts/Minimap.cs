@@ -2,49 +2,48 @@ using UnityEngine;
 
 public class Minimap : MonoBehaviour {
     public int mapSize;
+    // how large of a map to genrerate
     private int seed;
+    // the seed to use (DO NOT ASSIGN)
     public int mapScale;
+    // the scale of the map to create
     public int octaves;
     public float persistence;
     public float lacunarity;
+    // same as in noise.cs
     private Vector2 origin = new Vector2(0.5f, 0.5f);
     private ChunkGenerator chunkGenerator;
     private Rect mapRect;
     private Player player;
-    public float hueFrequency;
-    public float hueStrength;
+    // pretty self explanatory
 
     private void Start() {
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
         player = FindObjectOfType<Player>();
         mapRect = new Rect(0, 0, mapSize, mapSize);
         seed = chunkGenerator.seed;
+        // assign various things needed later on
     }
 
     private void FixedUpdate() {
+        // ~50 times per second, no matter the machine
         Vector2 center = new Vector2(Mathf.RoundToInt(player.transform.position.x * (mapScale / chunkGenerator.noiseScale)), Mathf.Round(player.transform.position.y * (mapScale / chunkGenerator.noiseScale)));
+        // get the position of the player from the actual map relative to the minimap
         float[,] noiseMap = Noise.GenerateNoiseMap(mapSize, seed, mapScale, octaves, persistence, lacunarity, center);
-        float[,] hueMap = Noise.GenerateHueMap(mapSize, seed, mapScale, hueFrequency, center);
-        // apply hue map
+        // create the maps
         Color[] colorMap = new Color[mapSize * mapSize];
-        float H, S, V;
+        // create an array to place colors into
         for (int y = 0; y < mapSize; y++) {
             for (int x = 0; x < mapSize; x++) {
+                // for every point (x,y)
                 for (int i = 0; i < chunkGenerator.regions.Length; i++) {
                     // for every region
                     if (noiseMap[x, y] <= chunkGenerator.regions[i].height) {
                         // found the region that the point belongs to 
-                        Color newColor = chunkGenerator.regions[i].color;
-                        if (noiseMap[x, y] <= 0.2 && hueMap[x, y] > 0) {
-                            Color.RGBToHSV(newColor, out H, out S, out V);
-                            // get the HSV variables from the color
-                            newColor = Color.HSVToRGB(H - hueMap[x, y]/hueStrength, S, V);
-                            // use the hsv variables to create a new color, but with modified hue (make it more green or blue)
-                        }
-                        colorMap[y * mapSize + x] = newColor;
+                        colorMap[y * mapSize + x] = chunkGenerator.regions[i].color;
                         // assign the color at given point to the colormap
                         break;
-                        // no need to check other chunkGenerator.regions, so break out
+                        // no need to check other regions, so break out
                     }
                 }
             }
