@@ -55,7 +55,6 @@ public class ChunkGenerator : MonoBehaviour {
     private void Start() {
         chunkRect = new Rect(0, 0, chunkSize, chunkSize);
     }
-
     
 	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
         // bool generateExtra = false;
@@ -122,67 +121,11 @@ public class ChunkGenerator : MonoBehaviour {
         // create a sprite from the chunk
         chunks.Add(newChunk);
         // add it to the list
-        // if (generateExtra) { GenerateOverlayChunk(center, hueMap, ditherMap); }
+        newChunk.transform.parent = transform;
+        // child it to this gameobject
         return newChunk;
+        // return it
 	}
-
-    // public GameObject GenerateOverlayChunk(Vector2 center, float[,] hueMap, float[,] ditherMap) {
-    //     float[,] noiseMap = Noise.GenerateNoiseMap(chunkSize, seed, noiseScale, octaves, persistence, lacunarity, center);
-    //     Color[] colorMap = new Color[chunkSize * chunkSize];
-    //     float H, S, V;
-    //     for (int y = 0; y < chunkSize; y++) {
-    //         for (int x = 0; x < chunkSize; x++) {
-    //             float currentHeight = noiseMap[x, y];
-    //             for (int i = 0; i < regions.Length; i++) {
-    //                 if (currentHeight <= regions[i].height) {
-    //                     Color newColor = regions[i].color;
-    //                     Color.RGBToHSV(newColor, out H, out S, out V);
-    //                     newColor = Color.HSVToRGB(H - hueMap[x, y]/hueStrength, S + ditherMap[x,y] / 2, V + ditherMap[x,y]);
-    //                     colorMap[y * chunkSize + x] = newColor;
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     Texture2D texture = new Texture2D(chunkSize, chunkSize);
-    //     texture.filterMode = FilterMode.Point;
-    //     texture.wrapMode = TextureWrapMode.Clamp;
-    //     texture.SetPixels(colorMap);
-    //     texture.Apply();
-    //     GameObject newChunk = Instantiate(mapPrefab, center, Quaternion.identity);
-    //     newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
-    //     newChunk.GetComponent<SpriteRenderer>().sortingOrder = 1;
-    //     Color temp = newChunk.GetComponent<SpriteRenderer>().color;
-    //     temp.a = 0.5f;
-    //     newChunk.GetComponent<SpriteRenderer>().color = temp;
-    //     chunks.Add(newChunk);
-    //     return newChunk;
-    // }
-
-	// public GameObject ChunkTest(Vector2 center) {
-    //     float[,] hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center);
-    //     float[,] ditherMap = Noise.GenerateDitherMap(chunkSize, seed, center, ditherStrength);
-	// 	int[,] noiseMap = Noise.GenerateCoralMap(chunkSize, hueMap, seed, coralSpawnChance, center);
-    //     Color[] colorMap = new Color[chunkSize * chunkSize];
-    //     for (int y = 0; y < chunkSize; y++) {
-    //         for (int x = 0; x < chunkSize; x++) {
-    //             if (noiseMap[x,y] != 0) {
-    //                 colorMap[y * chunkSize + x] = coralColors[noiseMap[x,y] - 1];
-    //             }
-    //         }
-    //     }
-    //     Texture2D texture = new Texture2D(chunkSize, chunkSize);
-    //     texture.filterMode = FilterMode.Point;
-    //     texture.wrapMode = TextureWrapMode.Clamp;
-    //     texture.SetPixels(colorMap);
-    //     texture.Apply();
-    //     foreach(GameObject chunk in chunks) { DestroyImmediate(chunk); }
-    //     chunks.Clear();
-    //     GameObject newChunk = Instantiate(mapPrefab, center, Quaternion.identity);
-    //     newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
-    //     chunks.Add(newChunk);
-    //     return newChunk;
-	// }
 
 	void OnValidate() {
         // called every time an inspector variable is updated
