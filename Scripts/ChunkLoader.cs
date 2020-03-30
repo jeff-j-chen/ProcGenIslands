@@ -46,12 +46,8 @@ public class ChunkLoader : MonoBehaviour {
                     // add the chunk's position to the array
                     if (!player.PointInViewDist(chunkPositions[i])) {
                         // if the chunk position is not within the player's viewing radius
-                        chunkGenerator.chunks[i].GetComponent<SpriteRenderer>().sprite = null;
-                        // hide it
-                        Destroy(chunkGenerator.chunks[i]);
-                        // destroy it
                         chunkGenerator.chunks.RemoveAt(i);
-                        // remove it
+                        // remove the chunk from the list
                     }
                 } 
                 GenerateNewTestPositions();
@@ -76,13 +72,13 @@ public class ChunkLoader : MonoBehaviour {
     private void GenerateNewTestPositions() {
         // makes a list of potential positions to spawn chunks in
         testPositions.Clear();
-        testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x - 50f, chunkGenerator.centerChunk.transform.position.y + 50f));
-        testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x, chunkGenerator.centerChunk.transform.position.y + 50f));
-        testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x + 50f, chunkGenerator.centerChunk.transform.position.y + 50f));
-        testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x - 50f, chunkGenerator.centerChunk.transform.position.y));
-        testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x + 50f, chunkGenerator.centerChunk.transform.position.y));
-        testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x - 50f, chunkGenerator.centerChunk.transform.position.y - 50f));
-        testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x, chunkGenerator.centerChunk.transform.position.y - 50f));
-        testPositions.Add(new Vector2(chunkGenerator.centerChunk.transform.position.x + 50f, chunkGenerator.centerChunk.transform.position.y - 50f));
+        testPositions.Add(new Vector3(chunkGenerator.centerChunk.transform.position.x - 50f, chunkGenerator.centerChunk.transform.position.y + 50f, 0f));
+        testPositions.Add(new Vector3(chunkGenerator.centerChunk.transform.position.x, chunkGenerator.centerChunk.transform.position.y + 50f, 0f));
+        testPositions.Add(new Vector3(chunkGenerator.centerChunk.transform.position.x + 50f, chunkGenerator.centerChunk.transform.position.y + 50f, 0f));
+        testPositions.Add(new Vector3(chunkGenerator.centerChunk.transform.position.x - 50f, chunkGenerator.centerChunk.transform.position.y, 0f));
+        testPositions.Add(new Vector3(chunkGenerator.centerChunk.transform.position.x + 50f, chunkGenerator.centerChunk.transform.position.y, 0f));
+        testPositions.Add(new Vector3(chunkGenerator.centerChunk.transform.position.x - 50f, chunkGenerator.centerChunk.transform.position.y - 50f, 0f));
+        testPositions.Add(new Vector3(chunkGenerator.centerChunk.transform.position.x, chunkGenerator.centerChunk.transform.position.y - 50f, 0f));
+        testPositions.Add(new Vector3(chunkGenerator.centerChunk.transform.position.x + 50f, chunkGenerator.centerChunk.transform.position.y - 50f, 0f));
     }
 }

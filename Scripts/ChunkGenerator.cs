@@ -43,13 +43,13 @@ public class ChunkGenerator : MonoBehaviour {
     float[,] ditherMap;
     int[,] coralMap;
     private Rect chunkRect;
+    public GameObject chunkParent;
 
     private void Start() {
         chunkRect = new Rect(0, 0, chunkSize, chunkSize);
     }
     
 	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
-        // bool generateExtra = false;
         hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center);
         ditherMap = Noise.GenerateDitherMap(chunkSize, seed, center, ditherStrength);
         // if (applyCoral) { coralMap = Noise.GenerateCoralMap(chunkSize, hueMap, seed, coralSpawnChance, center); }
@@ -115,6 +115,9 @@ public class ChunkGenerator : MonoBehaviour {
         // add it to the list
         newChunk.transform.parent = transform;
         // child it to this gameobject
+        FindObjectOfType<Minimap>().savedMinimapChunks.Add(newChunk);
+        newChunk.transform.parent = chunkParent.transform;
+        // add the chunk to the minimap chunks
         return newChunk;
         // return it
 	}
