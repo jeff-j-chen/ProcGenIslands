@@ -27,9 +27,10 @@ public class Minimap : MonoBehaviour {
     Vector3 downPoint;
 
 
-    private void Start() {
+    private void Awake() {
         mainCamera.enabled = true;
         minimapCamera.enabled = false;
+        savedMinimapChunks = new List<GameObject>();
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
         player = FindObjectOfType<Player>();
         mapRect = new Rect(0, 0, mapSize, mapSize);

@@ -36,8 +36,11 @@ public class Player : MonoBehaviour {
     public TextMeshProUGUI coordinates;
     // textmeshpro object representing the player's coordinates
     public Camera minimapCamera;
+    public bool isOnLand = false;
+    private ChunkGenerator chunkGenerator;
 
     private void Start() {
+        chunkGenerator = FindObjectOfType<ChunkGenerator>();
         particleLifetime = new WaitForSeconds(_particleLifetime);
         // create the waitforseconds
     }
@@ -98,6 +101,17 @@ public class Player : MonoBehaviour {
             // if minimap camera is on, stop movement immediately
             GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
         }
+        int xCoord = Mathf.RoundToInt(transform.position.x) > 0 ? Mathf.RoundToInt(transform.position.x) % 50 : 50 + (Mathf.RoundToInt(transform.position.x) % 50);
+        int yCoord = Mathf.RoundToInt(transform.position.y) > 0 ? 50 - (Mathf.RoundToInt(transform.position.y) % 50) : 50 + (Mathf.RoundToInt(transform.position.y) % 50);
+        try {
+            if (chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[xCoord, yCoord] >= 0.2f) {
+                isOnLand = true;
+            }
+            else {
+                isOnLand = false;
+            }
+        }
+        catch {}
     }
     
     public void InstantiateParticle() {

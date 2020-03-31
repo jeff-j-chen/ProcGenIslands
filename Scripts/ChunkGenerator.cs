@@ -42,13 +42,12 @@ public class ChunkGenerator : MonoBehaviour {
     float[,] hueMap;
     float[,] ditherMap;
     int[,] coralMap;
-    private Rect chunkRect;
     public GameObject chunkParent;
-
-    private void Start() {
-        chunkRect = new Rect(0, 0, chunkSize, chunkSize);
-    }
     
+    private void Awake() {
+        chunks = new List<GameObject>();
+    }
+
 	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
         hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center);
         ditherMap = Noise.GenerateDitherMap(chunkSize, seed, center, ditherStrength);
@@ -72,7 +71,7 @@ public class ChunkGenerator : MonoBehaviour {
                         if (currentHeight <= 0.2 && hueMap[x, y] > 0) {
                             Color.RGBToHSV(newColor, out H, out S, out V);
                             // get the HSV variables from the color
-                            newColor = Color.HSVToRGB(H - hueMap[x, y]/hueStrength, S, V);
+                            newColor = Color.HSVToRGB(H - hueMap[x, y] / hueStrength, S, V);
                             // use the hsv variables to create a new color, but with modified hue (make it more green or blue)
                         }
                         Color.RGBToHSV(newColor, out H, out S, out V);
@@ -104,20 +103,17 @@ public class ChunkGenerator : MonoBehaviour {
         // remove any existing chunks if desired (used for editing in scene mode)
         GameObject newChunk = Instantiate(mapPrefab, center, Quaternion.identity);
         // instantiate a new chunk gameobject
-        if (removeExisting) {
-            newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
-        }
-        else {
-            newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, chunkRect, origin, 1f, 0u, SpriteMeshType.FullRect);
-        }
+        newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
         // create a sprite from the chunk
         chunks.Add(newChunk);
         // add it to the list
         newChunk.transform.parent = transform;
-        // child it to this gameobject
         FindObjectOfType<Minimap>().savedMinimapChunks.Add(newChunk);
-        newChunk.transform.parent = chunkParent.transform;
         // add the chunk to the minimap chunks
+        newChunk.transform.parent = chunkParent.transform;
+        // child the chunk to a gameobject
+        newChunk.GetComponent<Chunk>().noiseMap = noiseMap;
+        // assign the noisemap variable
         return newChunk;
         // return it
 	}
