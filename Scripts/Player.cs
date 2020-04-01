@@ -39,6 +39,8 @@ public class Player : MonoBehaviour {
     public Camera minimapCamera;
     public bool isOnLand = false;
     private ChunkGenerator chunkGenerator;
+    public Sprite landSprite;
+    public Sprite waterSprite;
 
     private void Start() {
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
@@ -81,6 +83,7 @@ public class Player : MonoBehaviour {
                     transform.position = new Vector2(transform.position.x + 1f, transform.position.y);
                 }
                 // move 1 unit based on player input
+                coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
             }
         }
         int xCoord;
@@ -107,12 +110,21 @@ public class Player : MonoBehaviour {
                     moveVel = 0;
                     // remove all player velocity
                     transform.eulerAngles = new Vector3(0, 0, 0);
+                    minimapIcon.transform.eulerAngles = new Vector3(0, 0, 0);
                     // reset transform
+                    minimapIcon.GetComponent<SpriteRenderer>().sprite = landSprite;
+                    GetComponent<SpriteRenderer>().sprite = landSprite;
+                    // set the player's sprite based on location
                 }
                 isOnLand = true;
                 // change bool to represent where the player is
             }
             else {
+                if (isOnLand) {
+                    minimapIcon.GetComponent<SpriteRenderer>().sprite = waterSprite;
+                    GetComponent<SpriteRenderer>().sprite = waterSprite;
+                    // set the player's sprite based on location
+                }
                 // player is in water
                 isOnLand = false;
                 // set bool
