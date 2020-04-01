@@ -390,6 +390,7 @@ MonoBehaviour:
   minimapCamera: {fileID: 1902607935}
   isOnLand: 0
   checking: {x: 0, y: 0}
+  curHeightOf: 0
 --- !u!61 &464161842
 BoxCollider2D:
   m_ObjectHideFlags: 0

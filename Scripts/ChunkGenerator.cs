@@ -51,7 +51,6 @@ public class ChunkGenerator : MonoBehaviour {
 	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
         hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center);
         ditherMap = Noise.GenerateDitherMap(chunkSize, seed, center, ditherStrength);
-        // if (applyCoral) { coralMap = Noise.GenerateCoralMap(chunkSize, hueMap, seed, coralSpawnChance, center); }
 		float[,] noiseMap = Noise.GenerateNoiseMap(chunkSize, seed, noiseScale, octaves, persistence, lacunarity, center);
         // generate the noise map with the given variables
         Color[] colorMap = new Color[chunkSize * chunkSize];
@@ -103,6 +102,8 @@ public class ChunkGenerator : MonoBehaviour {
         // remove any existing chunks if desired (used for editing in scene mode)
         GameObject newChunk = Instantiate(mapPrefab, center, Quaternion.identity);
         // instantiate a new chunk gameobject
+        newChunk.GetComponent<Chunk>().noiseMap = noiseMap;
+        // assign the noisemap variable of the chunk
         newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
         // create a sprite from the chunk
         chunks.Add(newChunk);
@@ -112,8 +113,6 @@ public class ChunkGenerator : MonoBehaviour {
         // add the chunk to the minimap chunks
         newChunk.transform.parent = chunkParent.transform;
         // child the chunk to a gameobject
-        newChunk.GetComponent<Chunk>().noiseMap = noiseMap;
-        // assign the noisemap variable
         return newChunk;
         // return it
 	}

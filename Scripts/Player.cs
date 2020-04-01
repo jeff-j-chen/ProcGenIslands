@@ -104,7 +104,7 @@ public class Player : MonoBehaviour {
             GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
         }
         int xCoord = Mathf.RoundToInt(transform.position.x) > 0 ? Mathf.RoundToInt(transform.position.x) % 50 : 49 + (Mathf.RoundToInt(transform.position.x) % 50);
-        int yCoord = Mathf.RoundToInt(transform.position.y) > 0 ? 49 - (Mathf.RoundToInt(transform.position.y) % 50) : 49 + (Mathf.RoundToInt(transform.position.y) % 50);
+        int yCoord = Mathf.RoundToInt(transform.position.y) > 0 ? Mathf.RoundToInt(transform.position.y) % 50 : 49 + (Mathf.RoundToInt(transform.position.y) % 50);
         checking = new Vector2(xCoord, yCoord);
         if (chunkGenerator.centerChunk != null) {
             if (chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[xCoord, yCoord] >= 0.2f) {
