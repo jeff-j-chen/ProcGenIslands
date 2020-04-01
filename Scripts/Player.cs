@@ -38,8 +38,6 @@ public class Player : MonoBehaviour {
     public Camera minimapCamera;
     public bool isOnLand = false;
     private ChunkGenerator chunkGenerator;
-    public Vector2 checking;
-    public float curHeightOf;
 
     private void Start() {
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
@@ -105,7 +103,6 @@ public class Player : MonoBehaviour {
         }
         int xCoord = Mathf.RoundToInt(transform.position.x) > 0 ? Mathf.RoundToInt(transform.position.x) % 50 : 49 + (Mathf.RoundToInt(transform.position.x) % 50);
         int yCoord = Mathf.RoundToInt(transform.position.y) > 0 ? Mathf.RoundToInt(transform.position.y) % 50 : 49 + (Mathf.RoundToInt(transform.position.y) % 50);
-        checking = new Vector2(xCoord, yCoord);
         if (chunkGenerator.centerChunk != null) {
             if (chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[xCoord, yCoord] >= 0.2f) {
                 isOnLand = true;
@@ -113,7 +110,6 @@ public class Player : MonoBehaviour {
             else {
                 isOnLand = false;
             }
-            curHeightOf = chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[xCoord, yCoord];
         }
     }
     
