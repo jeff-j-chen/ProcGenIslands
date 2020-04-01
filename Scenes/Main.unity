@@ -389,6 +389,7 @@ MonoBehaviour:
   coordinates: {fileID: 1354377997}
   minimapCamera: {fileID: 1902607935}
   isOnLand: 0
+  checking: {x: 0, y: 0}
 --- !u!61 &464161842
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1011,7 +1012,7 @@ MonoBehaviour:
   lacunarity: 2
   hueFrequency: 0.25
   seed: 2
-  center: {x: 25, y: -25}
+  center: {x: 0, y: 0}
   regions:
   - name: t
     height: -1
