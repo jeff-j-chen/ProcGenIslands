@@ -20,7 +20,7 @@ public class ChunkGeneratorEditor : Editor {
         }
         if (GUILayout.Button("Generate")) {
             // if player clicked the "generate" button
-            mapGen.GenerateChunkAt(mapGen.center);
+            mapGen.GenerateChunkAt(mapGen.center, true);
             // generate the map
             // mapGen.ChunkTest(mapGen.center);
         }

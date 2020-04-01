@@ -19,10 +19,10 @@ public class ChunkLoader : MonoBehaviour {
     // floats telling us where the player was last, used to help performance
 
     private void Awake() {
-        chunkGenerator.GenerateChunkAt(new Vector2(25, 25));
-        chunkGenerator.GenerateChunkAt(new Vector2(-25, 25));
-        chunkGenerator.GenerateChunkAt(new Vector2(-25, -25));
-        chunkGenerator.GenerateChunkAt(new Vector2(25, -25));
+        chunkGenerator.GenerateChunkAt(new Vector2(25.5f, 25.5f));
+        chunkGenerator.GenerateChunkAt(new Vector2(-24.5f, 25.5f));
+        chunkGenerator.GenerateChunkAt(new Vector2(-24.5f, -24.5f));
+        chunkGenerator.GenerateChunkAt(new Vector2(25.5f, -24.5f));
         waitTime = new WaitForSeconds(chunkUpdateDelay);
         // create the wait time
         player = FindObjectOfType<Player>();

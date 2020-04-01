@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using TMPro;
 
@@ -46,19 +47,76 @@ public class Player : MonoBehaviour {
     }
    
     private void Update() {
-        // set the rotation speed when the left/right key is held, and decay movement velocity
-        if (Input.GetKey(KeyCode.RightArrow)) {
-            curRotSpeed = -rotSpeed;
-            moveVel /= rotVelDecay;
-            // set rotation and decay movement velocity by a %
+        if (!isOnLand) {
+            // in water
+            // set the rotation speed when the left/right key is held, and decay movement velocity
+            if (Input.GetKey(KeyCode.RightArrow)) {
+                curRotSpeed = -rotSpeed;
+                moveVel /= rotVelDecay;
+                // set rotation and decay movement velocity by a %
+            }
+            else if (Input.GetKey(KeyCode.LeftArrow)) {
+                curRotSpeed = rotSpeed;
+                moveVel /= rotVelDecay;
+            }
+            if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow)) {
+                curRotSpeed = 0f;
+                // upon release of left/right, remove all rotational speed
+            }
         }
-        else if (Input.GetKey(KeyCode.LeftArrow)) {
-            curRotSpeed = rotSpeed;
-            moveVel /= rotVelDecay;
+        else {
+            // on land
+            if (!minimapCamera.enabled) {
+                // can't move with the minimap on
+                if (Input.GetKeyDown(KeyCode.UpArrow)) {
+                    transform.position = new Vector2(transform.position.x, transform.position.y + 1f);
+                }
+                else if (Input.GetKeyDown(KeyCode.DownArrow)) {
+                    transform.position = new Vector2(transform.position.x, transform.position.y - 1f);
+                }
+                else if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+                    transform.position = new Vector2(transform.position.x - 1f, transform.position.y);
+                }
+                else if (Input.GetKeyDown(KeyCode.RightArrow)) {
+                    transform.position = new Vector2(transform.position.x + 1f, transform.position.y);
+                }
+                // move 1 unit based on player input
+            }
         }
-        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow)) {
-            curRotSpeed = 0f;
-            // upon release of left/right, remove all rotational speed
+        int xCoord;
+        int roundedX = Mathf.RoundToInt(transform.position.x - 1);
+        int yCoord;
+        int roundedY = Mathf.RoundToInt(transform.position.y - 1);
+        if (roundedX > 0) { xCoord = roundedX % 50; }
+        else if (roundedX == 0) { xCoord = 0; }
+        else { xCoord = 49 + (roundedX % 50); }
+        if (roundedY > 0) { yCoord = roundedY % 50; }
+        else if (roundedY == 0) { yCoord = 0; }
+        else { yCoord = 49 + (roundedY % 50); }
+        // convert the player's current position into (x,y) for indexing the current chunk's noisemap
+        if (chunkGenerator.centerChunk != null) {
+            // here so that an annoying error doesn't pop up
+            if (chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[xCoord, yCoord] >= 0.2f) {
+                // if the player is now on land
+                if (!isOnLand) {
+                    // if the player was not previously on land
+                    transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+                    // set the player to be on the land
+                    GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                    // remove all rigidbody velocity
+                    moveVel = 0;
+                    // remove all player velocity
+                    transform.eulerAngles = new Vector3(0, 0, 0);
+                    // reset transform
+                }
+                isOnLand = true;
+                // change bool to represent where the player is
+            }
+            else {
+                // player is in water
+                isOnLand = false;
+                // set bool
+            }
         }
     }
 
@@ -66,58 +124,55 @@ public class Player : MonoBehaviour {
         // called a certain # of times per second, rather than per frame. makes it so that movement is fair between computers that run the game at different framerates
         if (!minimapCamera.enabled) {
             // only move if the minimap is off
-            // increase the movement velocity when the up/down key is held, up to a cap
-            if (Input.GetKey(KeyCode.UpArrow)) {
-                moveVel += 0.1f * moveIncreaseRate;
-                moveVel = moveVel > maxSpeed ? maxSpeed : moveVel;
-            }
-            else if (Input.GetKey(KeyCode.DownArrow)) {
-                moveVel -= 0.075f * moveIncreaseRate;
-                moveVel = moveVel < -maxSpeed / 3 ? -maxSpeed / 3 : moveVel;
-            }
-            if (-limiter <= moveVel && moveVel <= limiter) { moveVel = 0f; }
-            // instantly set movement velocity to 0 if within the limits (+- 0.1 works well)
-            else {
-                // don't clamp, so decrease it down to 0
-                if (moveVel > 0) { moveVel -= 0.05f * moveIncreaseRate; }
-                else { moveVel += 0.05f * moveIncreaseRate; }
-            }
+            if (!isOnLand) {
+                // if the player is in the water
+                if (Input.GetKey(KeyCode.UpArrow)) {
+                    moveVel += 0.1f * moveIncreaseRate;
+                    moveVel = moveVel > maxSpeed ? maxSpeed : moveVel;
+                }
+                else if (Input.GetKey(KeyCode.DownArrow)) {
+                    moveVel -= 0.075f * moveIncreaseRate;
+                    moveVel = moveVel < -maxSpeed / 3 ? -maxSpeed / 3 : moveVel;
+                }
+                // increase the movement velocity when the up/down key is held, up to a cap
+                if (-limiter <= moveVel && moveVel <= limiter) { moveVel = 0f; }
+                // instantly set movement velocity to 0 if within the limits (+- 0.1 works well)
+                else {
+                    // don't clamp, so decrease it down to 0
+                    if (moveVel > 0) { moveVel -= 0.05f * moveIncreaseRate; }
+                    else { moveVel += 0.05f * moveIncreaseRate; }
+                }
 
-            Vector3 newRotation = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z + curRotSpeed);
-            // create a new euler angle based on the rotation input
-            transform.eulerAngles = newRotation;
-            minimapIcon.transform.eulerAngles = newRotation;
-            // assign the rotation to the player and the player's minimap icon
-            GetComponent<Rigidbody2D>().velocity = new Vector2(moveVel * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f), moveVel * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f));
-            // create a vector based on the movement velocity and angle, then apply it to the rigidbody
-            if (Random.Range(0, spawnChance) <= Mathf.Abs(Mathf.RoundToInt(moveVel)) + 1) {
-                InstantiateParticle();
+                Vector3 newRotation = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z + curRotSpeed);
+                // create a new euler angle based on the rotation input
+                transform.eulerAngles = newRotation;
+                minimapIcon.transform.eulerAngles = newRotation;
+                // assign the rotation to the player and the player's minimap icon
+                GetComponent<Rigidbody2D>().velocity = new Vector2(moveVel * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f), moveVel * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f));
+                // create a vector based on the movement velocity and angle, then apply it to the rigidbody
+                if (UnityEngine.Random.Range(0, spawnChance) <= Mathf.Abs(Mathf.RoundToInt(moveVel)) + 1) {
+                    InstantiateParticle();
+                }
+                // instantiate a particle based on player speed
+                coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
+                // update the coordinate text 
             }
-            // instantiate a particle based on player speed
-            coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
-            // update the coordinate text 
         }
         else {
             // if minimap camera is on, stop movement immediately
             GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
         }
-        int xCoord = Mathf.RoundToInt(transform.position.x) > 0 ? Mathf.RoundToInt(transform.position.x) % 50 : 49 + (Mathf.RoundToInt(transform.position.x) % 50);
-        int yCoord = Mathf.RoundToInt(transform.position.y) > 0 ? Mathf.RoundToInt(transform.position.y) % 50 : 49 + (Mathf.RoundToInt(transform.position.y) % 50);
-        if (chunkGenerator.centerChunk != null) {
-            if (chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[xCoord, yCoord] >= 0.2f) {
-                isOnLand = true;
-            }
-            else {
-                isOnLand = false;
-            }
-        }
     }
     
     public void InstantiateParticle() {
-        GameObject createdParticle = Instantiate(waterParticle, new Vector2(transform.position.x + (Random.value * 2 - 1) * randOffset, transform.position.y + (Random.value * 2 - 1) * randOffset), Quaternion.identity);
+        GameObject createdParticle = Instantiate(waterParticle, new Vector2(transform.position.x + (UnityEngine.Random.value * 2 - 1) * randOffset, transform.position.y + (UnityEngine.Random.value * 2 - 1) * randOffset), Quaternion.identity);
+        // create a particle at the player's position, with a slight offset
         StartCoroutine(DestroyParticle(createdParticle));
+        // destroy the particle after a delay
         if (moveVel != 0f) {
-            createdParticle.GetComponent<Rigidbody2D>().velocity = new Vector2(-particleSpeed * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f  + (Random.value * 2 - 1) * randOffset), -particleSpeed * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f + (Random.value * 2 - 1) * randOffset));
+            // if the player is not standing still
+            createdParticle.GetComponent<Rigidbody2D>().velocity = new Vector2(-particleSpeed * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f  + (UnityEngine.Random.value * 2 - 1) * randOffset), -particleSpeed * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f + (UnityEngine.Random.value * 2 - 1) * randOffset));
+            // give the particle a little bit of movement in the opposite direction (with slight directional offset)
         }
     }
 
