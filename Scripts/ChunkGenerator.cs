@@ -35,6 +35,7 @@ public class ChunkGenerator : MonoBehaviour {
     [Header("Other")]
     public List<GameObject> chunks = new List<GameObject>();
     // list of created chunks
+    public List<Vector2> chunkPositions = new List<Vector2>();
     public GameObject centerChunk;
     // pink purple yellow red blue
     private Vector2 origin = new Vector2(0.5f, 0.5f);
@@ -107,10 +108,8 @@ public class ChunkGenerator : MonoBehaviour {
         newChunk.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, chunkSize, chunkSize), origin, 1f, 0u, SpriteMeshType.FullRect);
         // create a sprite from the chunk
         chunks.Add(newChunk);
+        chunkPositions.Add(center);
         // add it to the list
-        newChunk.transform.parent = transform;
-        FindObjectOfType<Minimap>().savedMinimapChunks.Add(newChunk);
-        // add the chunk to the minimap chunks
         newChunk.transform.parent = chunkParent.transform;
         // child the chunk to a gameobject
         return newChunk;

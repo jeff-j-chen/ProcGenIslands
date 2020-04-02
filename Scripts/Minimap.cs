@@ -18,9 +18,6 @@ public class Minimap : MonoBehaviour {
     private ChunkGenerator chunkGenerator;
     private Rect mapRect;
     private Player player;
-    // pretty self explanatory
-    public List<GameObject> savedMinimapChunks;
-    // used to store chunks to display the large map
     public float zoomLevel;
     public float zoomIncrease;
     public GameObject chunkParent;
@@ -30,7 +27,6 @@ public class Minimap : MonoBehaviour {
     private void Awake() {
         mainCamera.enabled = true;
         minimapCamera.enabled = false;
-        savedMinimapChunks = new List<GameObject>();
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
         player = FindObjectOfType<Player>();
         mapRect = new Rect(0, 0, mapSize, mapSize);
@@ -52,9 +48,9 @@ public class Minimap : MonoBehaviour {
                 // if we just enabled the minimap camera
                 chunkParent.transform.position = new Vector3(chunkParent.transform.position.x, chunkParent.transform.position.y, -3f);
                 // move the chunks forwards
-                for (int i = 0; i < savedMinimapChunks.Count; i++) {
-                    savedMinimapChunks[i].GetComponent<SpriteRenderer>().sortingLayerName = "ui";
-                    savedMinimapChunks[i].GetComponent<SpriteRenderer>().sortingOrder = 3;
+                for (int i = 0; i < chunkGenerator.chunks.Count; i++) {
+                    chunkGenerator.chunks[i].GetComponent<SpriteRenderer>().sortingLayerName = "ui";
+                    chunkGenerator.chunks[i].GetComponent<SpriteRenderer>().sortingOrder = 3;
                 }
                 // make each chunk render on top
                 player.transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
@@ -68,9 +64,9 @@ public class Minimap : MonoBehaviour {
             else {
                 chunkParent.transform.position = new Vector3(chunkParent.transform.position.x, chunkParent.transform.position.y, 0f);
                 // move the chunks backwards
-                for (int i = 0; i < savedMinimapChunks.Count; i++) {
-                    savedMinimapChunks[i].GetComponent<SpriteRenderer>().sortingLayerName = "default";
-                    savedMinimapChunks[i].GetComponent<SpriteRenderer>().sortingOrder = 0;
+                for (int i = 0; i < chunkGenerator.chunks.Count; i++) {
+                    chunkGenerator.chunks[i].GetComponent<SpriteRenderer>().sortingLayerName = "default";
+                    chunkGenerator.chunks[i].GetComponent<SpriteRenderer>().sortingOrder = 0;
                 }
                 // make each chunk render at the back
                 player.transform.localScale = new Vector3(1f, 1f, 1f);

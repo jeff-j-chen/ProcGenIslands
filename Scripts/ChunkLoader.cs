@@ -11,7 +11,6 @@ public class ChunkLoader : MonoBehaviour {
     // assigned at runtime
     private Player player;
     // the player
-    private List<Vector2> chunkPositions = new List<Vector2>();
     private List<Vector2> testPositions = new List<Vector2>();
     // lists used for checking if we need to spawn a chunk at a location 
     private float lastPlayerX;
@@ -40,23 +39,11 @@ public class ChunkLoader : MonoBehaviour {
             yield return waitTime;
             if (lastPlayerX != player.transform.position.x || lastPlayerY != player.transform.position.y) {
                 // first check if player has moved since last check, only then do we update
-                chunkPositions.Clear();
-                // clear the array in preparation for population
-                for (int i = 0; i < chunkGenerator.chunks.Count; i++) {
-                    // for every chunk that is in existence
-                    chunkPositions.Add(new Vector2(chunkGenerator.chunks[i].transform.position.x, chunkGenerator.chunks[i].transform.position.y));
-                    // add the chunk's position to the array
-                    if (!player.PointInViewDist(chunkPositions[i])) {
-                        // if the chunk position is not within the player's viewing radius
-                        chunkGenerator.chunks.RemoveAt(i);
-                        // remove the chunk from the list
-                    }
-                } 
                 GenerateNewTestPositions();
                 // get a list of the chunk positions
                 for (int i = 0; i < testPositions.Count; i++) {
                     // for every test position (for i faster than foreach) 
-                    if (!chunkPositions.Contains(testPositions[i]) && player.PointInViewDist(testPositions[i])) {
+                    if (!chunkGenerator.chunkPositions.Contains(testPositions[i]) && player.PointInViewDist(testPositions[i])) {
                         // if the test position is not already loaded and is within the player's view distance
                         GameObject createdChunk = chunkGenerator.GenerateChunkAt(testPositions[i]);
                         // create the chunk at that point
