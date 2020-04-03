@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections;
 using TMPro;
 
@@ -41,10 +40,11 @@ public class Player : MonoBehaviour {
     private ChunkGenerator chunkGenerator;
     public Sprite landSprite;
     public Sprite waterSprite;
-    public Vector2 ontoLandTest;
-    public Vector2 intoWaterTest;
+    public float _REQUIREDDELAY;
+    WaitForSeconds REQUIREDDELAY;
 
     private void Start() {
+        REQUIREDDELAY = new WaitForSeconds(_REQUIREDDELAY);
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
         particleLifetime = new WaitForSeconds(_particleLifetime);
         // create the waitforseconds
@@ -88,50 +88,7 @@ public class Player : MonoBehaviour {
                 coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
             }
         }
-        int xCoord;
-        int roundedX = Mathf.RoundToInt(transform.position.x - 1);
-        int yCoord;
-        int roundedY = Mathf.RoundToInt(transform.position.y - 1);
-        if (roundedX > 0) { xCoord = roundedX % 50; }
-        else if (roundedX == 0) { xCoord = 0; }
-        else { xCoord = 49 + ((roundedX + 1) % 50); }
-        if (roundedY > 0) { yCoord = roundedY % 50; }
-        else if (roundedY == 0) { yCoord = 0; }
-        else { yCoord = 49 + ((roundedY + 1) % 50); }
-        // convert the player's current position into (x,y) for indexing the current chunk's noisemap
-        if (chunkGenerator.centerChunk != null) {
-            // here so that an annoying error doesn't pop up
-            if (chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[xCoord, yCoord] >= 0.2f) {
-                // if the player is now on land
-                if (!isOnLand) {
-                    // if the player was not previously on land
-                    transform.position = new Vector2(Mathf.RoundToInt(transform.position.x + ontoLandTest.x), Mathf.RoundToInt(transform.position.y + ontoLandTest.y));
-                    // set the player to be on the land
-                    GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
-                    // remove all rigidbody velocity
-                    moveVel = 0;
-                    curRotSpeed = 0;
-                    // remove all player velocity
-                    transform.eulerAngles = new Vector3(0, 0, 0);
-                    minimapIcon.transform.eulerAngles = new Vector3(0, 0, 0);
-                    // reset transform
-                    GetComponent<SpriteRenderer>().sprite = landSprite;
-                    // set the player's sprite based on location
-                }
-                isOnLand = true;
-                // change bool to represent where the player is
-            }
-            else {
-                if (isOnLand) {
-                    transform.position = new Vector2(Mathf.RoundToInt(transform.position.x + intoWaterTest.x), Mathf.RoundToInt(transform.position.y + intoWaterTest.y));
-                    GetComponent<SpriteRenderer>().sprite = waterSprite;
-                    // set the player's sprite based on location
-                }
-                // player is in water
-                isOnLand = false;
-                // set bool
-            }
-        }
+        StartCoroutine(SetMovementMethod());
     }
 
     private void FixedUpdate() {
@@ -175,6 +132,52 @@ public class Player : MonoBehaviour {
         else {
             // if minimap camera is on, stop movement immediately
             GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
+        }
+    }
+
+    private IEnumerator SetMovementMethod() {
+        int x = 0;
+        int roundedX = Mathf.RoundToInt(transform.position.x - 1);
+        int y = 0;
+        int roundedY = Mathf.RoundToInt(transform.position.y - 1);
+        if (roundedX > 0) { x = roundedX % 50; }
+        else if (roundedX == 0) { x = 0; }
+        else { x = 49 + ((roundedX + 1) % 50); }
+        if (roundedY > 0) { y = roundedY % 50; }
+        else if (roundedY == 0) { y = 0; }
+        else { y = 49 + ((roundedY + 1) % 50); }
+        // convert the player's current position into (x,y) for indexing the current chunk's noisemap
+        yield return REQUIREDDELAY;
+        float height = chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[x, y];
+        if (height >= 0.2f) {
+            // if the player is now on land
+            if (!isOnLand) {
+                // if the player was not previously on land
+                transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+                // set the player to be on the land
+                GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                // remove all rigidbody velocity
+                moveVel = 0;
+                curRotSpeed = 0;
+                // remove all player velocity
+                transform.eulerAngles = new Vector3(0, 0, 0);
+                minimapIcon.transform.eulerAngles = new Vector3(0, 0, 0);
+                // reset transform
+                GetComponent<SpriteRenderer>().sprite = landSprite;
+                // set the player's sprite based on location
+            }
+            isOnLand = true;
+            // change bool to represent where the player is
+        }
+        else {
+            if (isOnLand) {
+                transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+                GetComponent<SpriteRenderer>().sprite = waterSprite;
+                // set the player's sprite based on location
+            }
+            // player is in water
+            isOnLand = false;
+            // set bool
         }
     }
     
