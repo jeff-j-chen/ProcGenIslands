@@ -42,11 +42,13 @@ public class Player : MonoBehaviour {
     public Sprite waterSprite;
     public float _REQUIREDDELAY;
     WaitForSeconds REQUIREDDELAY;
+    AudioSource[] sfx;
 
     private void Start() {
         REQUIREDDELAY = new WaitForSeconds(_REQUIREDDELAY);
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
         particleLifetime = new WaitForSeconds(_particleLifetime);
+        sfx = GetComponents<AudioSource>();
         // create the waitforseconds
     }
    
@@ -89,6 +91,7 @@ public class Player : MonoBehaviour {
             }
         }
         StartCoroutine(SetMovementMethod());
+        SetSfxVolume();
     }
 
     private void FixedUpdate() {
@@ -136,6 +139,7 @@ public class Player : MonoBehaviour {
     }
 
     private IEnumerator SetMovementMethod() {
+        yield return REQUIREDDELAY;
         int x = 0;
         int roundedX = Mathf.RoundToInt(transform.position.x - 1);
         int y = 0;
@@ -147,7 +151,6 @@ public class Player : MonoBehaviour {
         else if (roundedY == 0) { y = 0; }
         else { y = 49 + ((roundedY + 1) % 50); }
         // convert the player's current position into (x,y) for indexing the current chunk's noisemap
-        yield return REQUIREDDELAY;
         float height = chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[x, y];
         if (height >= 0.2f) {
             // if the player is now on land
@@ -178,6 +181,17 @@ public class Player : MonoBehaviour {
             // player is in water
             isOnLand = false;
             // set bool
+        }
+    }
+
+    private void SetSfxVolume() {
+        if (isOnLand) {
+            sfx[0].volume = 0f; // water
+            sfx[1].volume = 0.1f; // wind
+        }
+        else {
+            sfx[0].volume = (moveVel / maxSpeed) / 10f + 0.025f; // water
+            sfx[1].volume = (moveVel / maxSpeed) / 5f + 0.05f; // wind
         }
     }
     

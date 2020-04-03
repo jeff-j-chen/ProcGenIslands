@@ -61,7 +61,7 @@ public class Screenshot : MonoBehaviour {
         shaderGUItext = Shader.Find("GUI/Text Shader");
         shaderSpritesDefault = Shader.Find("Sprites/Default");
         // get various shaders
-        print("screen capture noise");
+        FindObjectOfType<SoundManager>().PlayClip("cameraClick");
         takenScreenshot.GetComponent<SpriteRenderer>().color = Color.black;
         // set to black
         yield return new WaitForSeconds(0.1f);
