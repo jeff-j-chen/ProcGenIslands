@@ -43,12 +43,19 @@ public class Player : MonoBehaviour {
     public float _REQUIREDDELAY;
     WaitForSeconds REQUIREDDELAY;
     AudioSource[] sfx;
+    public SoundManager soundManager;
+    public float _actionTimer;
+    WaitForSeconds actionTimer;
+    public bool canMove = true;
+    public GameObject footstep;
 
     private void Start() {
         REQUIREDDELAY = new WaitForSeconds(_REQUIREDDELAY);
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
         particleLifetime = new WaitForSeconds(_particleLifetime);
+        actionTimer = new WaitForSeconds(_actionTimer);
         sfx = GetComponents<AudioSource>();
+        soundManager = FindObjectOfType<SoundManager>();
         // create the waitforseconds
     }
    
@@ -72,26 +79,51 @@ public class Player : MonoBehaviour {
         }
         else {
             // on land
-            if (!minimapCamera.enabled) {
+            if (!minimapCamera.enabled && canMove) {
                 // can't move with the minimap on
                 if (Input.GetKeyDown(KeyCode.UpArrow)) {
+                    Instantiate(footstep, new Vector2(transform.position.x + (Random.value - 0.5f) / 5f, transform.position.y + (Random.value - 0.5f) / 5f), Quaternion.identity);
                     transform.position = new Vector2(transform.position.x, transform.position.y + 1f);
+                    coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
+                    soundManager.PlayClip($"walking{Random.Range(0, 4)}");
+                    StartCoroutine(LockActions());
+                    minimapIcon.transform.eulerAngles = new Vector3(0f, 0f, 90f);
                 }
                 else if (Input.GetKeyDown(KeyCode.DownArrow)) {
+                    Instantiate(footstep, new Vector2(transform.position.x + (Random.value - 0.5f) / 5f, transform.position.y + (Random.value - 0.5f) / 5f), Quaternion.identity);
                     transform.position = new Vector2(transform.position.x, transform.position.y - 1f);
+                    coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
+                    soundManager.PlayClip($"walking{Random.Range(0, 4)}");
+                    StartCoroutine(LockActions());
+                    minimapIcon.transform.eulerAngles = new Vector3(0f, 0f, -90f);
                 }
                 else if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+                    Instantiate(footstep, new Vector2(transform.position.x + (Random.value - 0.5f) / 5f, transform.position.y + (Random.value - 0.5f) / 5f), Quaternion.identity);
                     transform.position = new Vector2(transform.position.x - 1f, transform.position.y);
+                    coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
+                    soundManager.PlayClip($"walking{Random.Range(0, 4)}");
+                    StartCoroutine(LockActions());
+                    minimapIcon.transform.eulerAngles = new Vector3(0f, 0f, 180f);
                 }
                 else if (Input.GetKeyDown(KeyCode.RightArrow)) {
+                    Instantiate(footstep, new Vector2(transform.position.x + (Random.value - 0.5f) / 5f, transform.position.y + (Random.value - 0.5f) / 5f), Quaternion.identity);
                     transform.position = new Vector2(transform.position.x + 1f, transform.position.y);
+                    coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
+                    soundManager.PlayClip($"walking{Random.Range(0, 4)}");
+                    StartCoroutine(LockActions());
+                    minimapIcon.transform.eulerAngles = new Vector3(0f, 0f, 0f);
                 }
                 // move 1 unit based on player input
-                coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
             }
         }
         StartCoroutine(SetMovementMethod());
         SetSfxVolume();
+    }
+
+    private IEnumerator LockActions() {
+        canMove = false;
+        yield return actionTimer;
+        canMove = true;
     }
 
     private void FixedUpdate() {
@@ -117,7 +149,7 @@ public class Player : MonoBehaviour {
                     else { moveVel += 0.05f * moveIncreaseRate; }
                 }
 
-                Vector3 newRotation = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z + curRotSpeed);
+                Vector3 newRotation = new Vector3(0f, 0f, transform.eulerAngles.z + curRotSpeed);
                 // create a new euler angle based on the rotation input
                 transform.eulerAngles = newRotation;
                 minimapIcon.transform.eulerAngles = newRotation;
@@ -193,7 +225,7 @@ public class Player : MonoBehaviour {
     private void SetSfxVolume() {
         if (isOnLand) {
             sfx[0].volume = 0f; // water
-            sfx[1].volume = 0.1f; // wind
+            sfx[1].volume = 0.2f; // wind
         }
         else {
             sfx[0].volume = (moveVel / maxSpeed) / 10f + 0.025f; // water

@@ -548,6 +548,11 @@ MonoBehaviour:
   landSprite: {fileID: 21300000, guid: c14fc59140c02f34ab0524776c01a801, type: 3}
   waterSprite: {fileID: 21300000, guid: 7d5f0756ae9eb2942b056984af87abef, type: 3}
   _REQUIREDDELAY: 0.033333335
+  soundManager: {fileID: 0}
+  _actionTimer: 0.3
+  canMove: 1
+  footstep: {fileID: 7899973923647215659, guid: 98d7f2382cb7db54581a9d85abdfbfd0,
+    type: 3}
 --- !u!61 &464161842
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2630,7 +2635,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83abdd87a9f350d4485b34ea61393e79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioClips: []
+  audioClips:
+  - {fileID: 8300000, guid: 9fcaf09e538fbfb4cb18e76a78057735, type: 3}
+  - {fileID: 8300000, guid: 2a9bf7b2e9e818c48ad84cf77d7c817b, type: 3}
+  - {fileID: 8300000, guid: e95464d582fc4d54898e561c5643f271, type: 3}
+  - {fileID: 8300000, guid: d6a135083fb674b44a0ca1f2cc3eb77d, type: 3}
 --- !u!82 &1357252524
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2643,7 +2652,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.05
   m_Pitch: 1
   Loop: 0
   Mute: 0
