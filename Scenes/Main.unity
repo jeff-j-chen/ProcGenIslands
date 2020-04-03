@@ -544,6 +544,8 @@ MonoBehaviour:
   isOnLand: 0
   landSprite: {fileID: 21300000, guid: c14fc59140c02f34ab0524776c01a801, type: 3}
   waterSprite: {fileID: 21300000, guid: 7d5f0756ae9eb2942b056984af87abef, type: 3}
+  ontoLandTest: {x: 0, y: 0}
+  intoWaterTest: {x: 0, y: 0}
 --- !u!61 &464161842
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2014,7 +2016,7 @@ MonoBehaviour:
   persistence: 0.67
   lacunarity: 2
   hueFrequency: 0.2
-  seed: 0
+  seed: 2
   center: {x: 0, y: 0}
   regions:
   - name: t

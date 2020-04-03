@@ -41,6 +41,8 @@ public class Player : MonoBehaviour {
     private ChunkGenerator chunkGenerator;
     public Sprite landSprite;
     public Sprite waterSprite;
+    public Vector2 ontoLandTest;
+    public Vector2 intoWaterTest;
 
     private void Start() {
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
@@ -92,10 +94,10 @@ public class Player : MonoBehaviour {
         int roundedY = Mathf.RoundToInt(transform.position.y - 1);
         if (roundedX > 0) { xCoord = roundedX % 50; }
         else if (roundedX == 0) { xCoord = 0; }
-        else { xCoord = 49 + (roundedX % 50); }
+        else { xCoord = 49 + ((roundedX + 1) % 50); }
         if (roundedY > 0) { yCoord = roundedY % 50; }
         else if (roundedY == 0) { yCoord = 0; }
-        else { yCoord = 49 + (roundedY % 50); }
+        else { yCoord = 49 + ((roundedY + 1) % 50); }
         // convert the player's current position into (x,y) for indexing the current chunk's noisemap
         if (chunkGenerator.centerChunk != null) {
             // here so that an annoying error doesn't pop up
@@ -103,16 +105,16 @@ public class Player : MonoBehaviour {
                 // if the player is now on land
                 if (!isOnLand) {
                     // if the player was not previously on land
-                    transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+                    transform.position = new Vector2(Mathf.RoundToInt(transform.position.x + ontoLandTest.x), Mathf.RoundToInt(transform.position.y + ontoLandTest.y));
                     // set the player to be on the land
                     GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                     // remove all rigidbody velocity
                     moveVel = 0;
+                    curRotSpeed = 0;
                     // remove all player velocity
                     transform.eulerAngles = new Vector3(0, 0, 0);
                     minimapIcon.transform.eulerAngles = new Vector3(0, 0, 0);
                     // reset transform
-                    minimapIcon.GetComponent<SpriteRenderer>().sprite = landSprite;
                     GetComponent<SpriteRenderer>().sprite = landSprite;
                     // set the player's sprite based on location
                 }
@@ -121,7 +123,7 @@ public class Player : MonoBehaviour {
             }
             else {
                 if (isOnLand) {
-                    minimapIcon.GetComponent<SpriteRenderer>().sprite = waterSprite;
+                    transform.position = new Vector2(Mathf.RoundToInt(transform.position.x + intoWaterTest.x), Mathf.RoundToInt(transform.position.y + intoWaterTest.y));
                     GetComponent<SpriteRenderer>().sprite = waterSprite;
                     // set the player's sprite based on location
                 }
