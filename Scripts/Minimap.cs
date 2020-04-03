@@ -102,7 +102,10 @@ public class Minimap : MonoBehaviour {
         Vector2 center = new Vector2(Mathf.RoundToInt(player.transform.position.x * (mapScale / chunkGenerator.noiseScale)), Mathf.Round(player.transform.position.y * (mapScale / chunkGenerator.noiseScale)));
         // get the position of the player from the actual map relative to the minimap
         float[,] noiseMap = Noise.GenerateNoiseMap(mapSize, seed, mapScale, octaves, persistence, lacunarity, center);
-        // create the maps
+        float[,] biomeHueMap = Noise.GenerateNoiseMap(mapSize, seed + 1, 5 * mapScale, 3, 0.5f, 1.5f, center);
+		float[,] biomeValueMap = Noise.GenerateNoiseMap(mapSize, seed + 2, 5 * mapScale, 3, 0.5f, 1.5f, center);
+		float[,] biomeSaturationMap = Noise.GenerateNoiseMap(mapSize, seed + 3, 5 * mapScale, 3, 0.5f, 1.5f, center);
+        float[,] hueMap = Noise.GenerateHueMap(mapSize, seed - 2, mapScale, 0.25f, center);        // create the maps
         Color[] colorMap = new Color[mapSize * mapSize];
         // create an array to place colors into
         for (int y = 0; y < mapSize; y++) {
@@ -110,9 +113,26 @@ public class Minimap : MonoBehaviour {
                 // for every point (x,y)
                 for (int i = 0; i < chunkGenerator.regions.Length; i++) {
                     // for every region
-                    if (noiseMap[x, y] <= chunkGenerator.regions[i].height) {
+                    float currentHeight = noiseMap[x,y];
+                    float H, S, V;
+                    if (currentHeight <= chunkGenerator.regions[i].height) {
                         // found the region that the point belongs to
-                        colorMap[y * mapSize + x] = chunkGenerator.regions[i].color;
+                        Color newColor = chunkGenerator.regions[i].color;
+                        if (currentHeight <= 0.2 && hueMap[x, y] > 0) {
+                            Color.RGBToHSV(newColor, out H, out S, out V);
+                            // get the HSV variables from the color
+                            newColor = Color.HSVToRGB(H - hueMap[x, y] / 0.25f, S, V);
+                            // use the hsv variables to create a new color, but with modified hue (make it more green or blue)
+                        }
+                        else if (currentHeight > 0.2) {
+                            Color.RGBToHSV(newColor, out H, out S, out V);
+                            newColor = Color.HSVToRGB(
+                                H + ((biomeHueMap[x,y] + 1) / 2) / 2.333333f, 
+                                S + (biomeSaturationMap[x,y] - 0.2f) / 1f, 
+                                V + (biomeValueMap[x,y] - 0.4f) / 4f
+                            );
+                        }
+                        colorMap[y * mapSize + x] = newColor;
                         // assign the color at given point to the colormap
                         break;
                         // no need to check other regions, so break out
