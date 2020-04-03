@@ -138,8 +138,7 @@ public class Player : MonoBehaviour {
         }
     }
 
-    private IEnumerator SetMovementMethod() {
-        yield return REQUIREDDELAY;
+    private float GetHeightAtPos() {
         int x = 0;
         int roundedX = Mathf.RoundToInt(transform.position.x - 1);
         int y = 0;
@@ -151,36 +150,43 @@ public class Player : MonoBehaviour {
         else if (roundedY == 0) { y = 0; }
         else { y = 49 + ((roundedY + 1) % 50); }
         // convert the player's current position into (x,y) for indexing the current chunk's noisemap
-        float height = chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[x, y];
-        if (height >= 0.2f) {
-            // if the player is now on land
-            if (!isOnLand) {
-                // if the player was not previously on land
-                transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
-                // set the player to be on the land
-                GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
-                // remove all rigidbody velocity
-                moveVel = 0;
-                curRotSpeed = 0;
-                // remove all player velocity
-                transform.eulerAngles = new Vector3(0, 0, 0);
-                minimapIcon.transform.eulerAngles = new Vector3(0, 0, 0);
-                // reset transform
-                GetComponent<SpriteRenderer>().sprite = landSprite;
-                // set the player's sprite based on location
+        return chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[x, y];
+    }
+
+    private IEnumerator SetMovementMethod() {
+        float height = GetHeightAtPos();
+        yield return REQUIREDDELAY;
+        if (height == GetHeightAtPos()) {
+            if (height >= 0.2f) {
+                // if the player is now on land
+                if (!isOnLand) {
+                    // if the player was not previously on land
+                    transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+                    // set the player to be on the land
+                    GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                    // remove all rigidbody velocity
+                    moveVel = 0;
+                    curRotSpeed = 0;
+                    // remove all player velocity
+                    transform.eulerAngles = new Vector3(0, 0, 0);
+                    minimapIcon.transform.eulerAngles = new Vector3(0, 0, 0);
+                    // reset transform
+                    GetComponent<SpriteRenderer>().sprite = landSprite;
+                    // set the player's sprite based on location
+                }
+                isOnLand = true;
+                // change bool to represent where the player is
             }
-            isOnLand = true;
-            // change bool to represent where the player is
-        }
-        else {
-            if (isOnLand) {
-                transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
-                GetComponent<SpriteRenderer>().sprite = waterSprite;
-                // set the player's sprite based on location
+            else {
+                if (isOnLand) {
+                    transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+                    GetComponent<SpriteRenderer>().sprite = waterSprite;
+                    // set the player's sprite based on location
+                }
+                // player is in water
+                isOnLand = false;
+                // set bool
             }
-            // player is in water
-            isOnLand = false;
-            // set bool
         }
     }
 
@@ -215,14 +221,5 @@ public class Player : MonoBehaviour {
     public bool PointInViewDist(Vector2 point) {
         return (Mathf.Sqrt(Mathf.Pow(transform.position.x - point.x, 2) + Mathf.Pow(transform.position.y - point.y, 2)) < viewDist);
         // returns whether or not a point is within the player's view (render) distance
-    }
-
-    private void OnTriggerEnter2D(Collider2D other) {
-        StartCoroutine(SetNewCenterChunk(other));
-    }
-
-    private IEnumerator SetNewCenterChunk(Collider2D other) {
-        yield return REQUIREDDELAY;
-        FindObjectOfType<ChunkGenerator>().centerChunk = other.gameObject;
     }
 }
