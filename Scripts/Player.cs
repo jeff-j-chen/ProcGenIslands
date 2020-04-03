@@ -198,14 +198,17 @@ public class Player : MonoBehaviour {
         Destroy(particle);
     }
 
-
     public bool PointInViewDist(Vector2 point) {
         return (Mathf.Sqrt(Mathf.Pow(transform.position.x - point.x, 2) + Mathf.Pow(transform.position.y - point.y, 2)) < viewDist);
         // returns whether or not a point is within the player's view (render) distance
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
+        StartCoroutine(SetNewCenterChunk(other));
+    }
+
+    private IEnumerator SetNewCenterChunk(Collider2D other) {
+        yield return REQUIREDDELAY;
         FindObjectOfType<ChunkGenerator>().centerChunk = other.gameObject;
-        // called whenever the player moves into a new chunk
     }
 }
