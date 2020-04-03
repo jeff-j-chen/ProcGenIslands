@@ -1395,40 +1395,6 @@ MonoBehaviour:
   octaves: 7
   persistence: 0.67
   lacunarity: 2
-  savedMinimapChunks:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   zoomLevel: 10
   zoomIncrease: 3
   chunkParent: {fileID: 1322480735}
@@ -2047,8 +2013,8 @@ MonoBehaviour:
   octaves: 9
   persistence: 0.67
   lacunarity: 2
-  hueFrequency: 0.25
-  seed: 2
+  hueFrequency: 0.2
+  seed: 0
   center: {x: 0, y: 0}
   regions:
   - name: t
@@ -2089,33 +2055,142 @@ MonoBehaviour:
     color: {r: 0.24705881, g: 0.57047087, b: 0.85882354, a: 0}
   - name: h
     height: 0.3
-    color: {r: 0.809, g: 0.48070344, b: 0.246745, a: 0}
+    color: {r: 0.80784315, g: 0.3872549, b: 0.24705882, a: 0}
   - name: g
     height: 0.4
-    color: {r: 0.774, g: 0.4441728, b: 0.19195202, a: 0}
+    color: {r: 0.77254903, g: 0.3179085, b: 0.19215687, a: 0}
   - name: f
     height: 0.5
-    color: {r: 0.709, g: 0.36779377, b: 0.12407501, a: 0}
+    color: {r: 0.70980394, g: 0.23261437, b: 0.12549017, a: 0}
   - name: e
     height: 0.6
-    color: {r: 0.695, g: 0.343052, b: 0.10841997, a: 0}
+    color: {r: 0.69411767, g: 0.17797387, b: 0.10980393, a: 0}
   - name: d
     height: 0.7
-    color: {r: 0.6666667, g: 0.31601307, b: 0.098039195, a: 0}
+    color: {r: 0.6666667, g: 0.15490195, b: 0.098039195, a: 0}
   - name: c
     height: 0.8
-    color: {r: 0.645, g: 0.27605996, b: 0.09158997, a: 0}
+    color: {r: 0.6431373, g: 0.1362745, b: 0.09019607, a: 0}
   - name: b
     height: 0.9
-    color: {r: 0.59599996, g: 0.24356534, b: 0.06734802, a: 0}
+    color: {r: 0.59607846, g: 0.09313726, b: 0.06666666, a: 0}
   - name: a
     height: 1
-    color: {r: 0.5754717, g: 0.21873392, b: 0.05700427, a: 0}
+    color: {r: 0.5764706, g: 0.06745099, b: 0.058823537, a: 0}
   autoUpdate: 0
+  biomeHueStrength: 2.3333333
+  biomeValueStrength: 4
+  biomeValueOffset: 0.4
+  biomeSaturationStrength: 1
+  biomeSaturationOffset: 0.2
+  biomeNoiseScale: 5000
+  biomeOctaves: 3
+  biomePersistence: 0.5
+  biomeLacunarity: 1.5
   hueStrength: 6
   ditherStrength: 65
   chunks:
   - {fileID: 0}
+  chunkPositions:
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
   centerChunk: {fileID: 0}
   chunkParent: {fileID: 1322480735}
 --- !u!4 &1136209785

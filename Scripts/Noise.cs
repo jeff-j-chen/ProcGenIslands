@@ -55,7 +55,7 @@ public static class Noise {
             scale = 0.0001f;
         }
         // limit the scale
-		System.Random prng = new System.Random(seed * 2);
+		System.Random prng = new System.Random(seed);
         // get the seed
         float offsetX = prng.Next(-10000, 10000);
         float offsetY = prng.Next(-10000, 10000);

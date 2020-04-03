@@ -25,6 +25,17 @@ public class ChunkGenerator : MonoBehaviour {
     // array of structure which manages the colors applied to varying heights
 	public bool autoUpdate;
     // whether or not to automatically update the map every time something changes
+    [Header("Biome")] 
+    public float biomeHueStrength;
+    public float biomeValueStrength;
+    public float biomeValueOffset;
+    public float biomeSaturationStrength;
+    public float biomeSaturationOffset;
+    public int biomeNoiseScale;
+    public int biomeOctaves;
+    [Range(0,1)] public float biomePersistence;
+    public float biomeLacunarity;
+
     [Header("Hue")]
     public float hueStrength;
     // the strength of the hue to apply, bigger number is smaller effect
@@ -41,8 +52,12 @@ public class ChunkGenerator : MonoBehaviour {
     private Vector2 origin = new Vector2(0.5f, 0.5f);
     // pivot point to give sprites a pivot at their center
     float[,] hueMap;
+    float[,] biomeHueMap;
+    float[,] biomeValueMap;
+    float[,] biomeSaturationMap;
     float[,] ditherMap;
     int[,] coralMap;
+    float[,] noiseMap;
     public GameObject chunkParent;
     
     private void Awake() {
@@ -50,9 +65,12 @@ public class ChunkGenerator : MonoBehaviour {
     }
 
 	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
-        hueMap = Noise.GenerateHueMap(chunkSize, seed, noiseScale, hueFrequency, center);
-        ditherMap = Noise.GenerateDitherMap(chunkSize, seed, center, ditherStrength);
-		float[,] noiseMap = Noise.GenerateNoiseMap(chunkSize, seed, noiseScale, octaves, persistence, lacunarity, center);
+        hueMap = Noise.GenerateHueMap(chunkSize, seed - 2, noiseScale, hueFrequency, center);
+        ditherMap = Noise.GenerateDitherMap(chunkSize, seed - 1, center, ditherStrength);
+		noiseMap = Noise.GenerateNoiseMap(chunkSize, seed, noiseScale, octaves, persistence, lacunarity, center);
+		biomeHueMap = Noise.GenerateNoiseMap(chunkSize, seed + 1, biomeNoiseScale, biomeOctaves, biomePersistence, biomeLacunarity, center);
+		biomeValueMap = Noise.GenerateNoiseMap(chunkSize, seed + 2, biomeNoiseScale, biomeOctaves, biomePersistence, biomeLacunarity, center);
+		biomeSaturationMap = Noise.GenerateNoiseMap(chunkSize, seed + 3, biomeNoiseScale, biomeOctaves, biomePersistence, biomeLacunarity, center);
         // generate the noise map with the given variables
         Color[] colorMap = new Color[chunkSize * chunkSize];
         // make a new colormap to apply colors to
@@ -74,6 +92,15 @@ public class ChunkGenerator : MonoBehaviour {
                             newColor = Color.HSVToRGB(H - hueMap[x, y] / hueStrength, S, V);
                             // use the hsv variables to create a new color, but with modified hue (make it more green or blue)
                         }
+                        else if (currentHeight > 0.2) {
+                            Color.RGBToHSV(newColor, out H, out S, out V);
+                            newColor = Color.HSVToRGB(
+                                H + ((biomeHueMap[x,y] + 1) / 2) / biomeHueStrength, 
+                                S + (biomeSaturationMap[x,y] - biomeSaturationOffset) / biomeSaturationStrength, 
+                                V + (biomeValueMap[x,y] - biomeValueOffset) / biomeValueStrength
+                            );
+                        }
+                        
                         Color.RGBToHSV(newColor, out H, out S, out V);
                         // get the HSV variables from the color
                         newColor = Color.HSVToRGB(H, S + ditherMap[x,y] / 2, V + ditherMap[x,y]);
