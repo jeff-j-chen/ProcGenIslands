@@ -4,15 +4,21 @@ using System;
 
 public class Screenshot : MonoBehaviour {
     public GameObject screenshotPrefab;
+    // prefab of the screenshot
     public GameObject borderPrefab;
+    // prefab of the screenshot's border
     public Camera myCamera;
+    // the camera to take screenshots from
     private bool takeScreenShotOnNextFrame;
+    // whether or not to take a screenshot next frame
     int width;
     int height;
-    private SpriteRenderer myRenderer;
+    // dimensions of the screenshot to take
     private Shader shaderGUItext;
     private Shader shaderSpritesDefault;
+    // used for flashing the sprite black and white, tip i saw online
     public bool lockScreenshot = false;
+    // prevent player from spamming screenshots
     private void Start() {
         myCamera = GetComponent<Camera>();
         // set the camera
@@ -72,7 +78,7 @@ public class Screenshot : MonoBehaviour {
         yield return new WaitForSeconds(0.05f);
         // wait tiny bit
         takenScreenshot.GetComponent<SpriteRenderer>().material.shader = shaderSpritesDefault;
-        // change to normal, so it flashes black-white-normal 
+        // change to normal (it flashes black-white-normal, causing visual contrast)
         yield return new WaitForSeconds(0.75f);
         // show picture on screen for a time
         for (int i = 0; i < 20; i++) {
@@ -80,7 +86,7 @@ public class Screenshot : MonoBehaviour {
             screenshotBorder.transform.localScale = new Vector3(screenshotBorder.transform.localScale.x - 0.134f / 2f, screenshotBorder.transform.localScale.y - 0.134f / 2f, screenshotBorder.transform.localScale.z);
             yield return new WaitForSeconds(0.025f / 2f);
         }
-        // scale the screenshot and border down over the course of 0.25s
+        // scale the screenshot and border down over a short amount of time
         Destroy(takenScreenshot);
         Destroy(screenshotBorder);
         // destroy both gameobjects
@@ -97,15 +103,21 @@ public class Screenshot : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Space)) {
             // take screenshot when space is pressed
             if (!lockScreenshot) { 
+                // if the player can take a screenshot
                 lockScreenshot = true;
+                // prevent them from doing so
                 StartCoroutine(UnlockScreenshot());
+                // let them do it after a delay
                 TakeScreenShot(800, 600); 
+                // take a screenshot of the whole screen
             }
         }
     }
 
     public IEnumerator UnlockScreenshot() {
         yield return new WaitForSeconds(1.5f);
+        // wait 1.5s 
         lockScreenshot = false;
+        // allow another screenshot to be taken
     }
 }

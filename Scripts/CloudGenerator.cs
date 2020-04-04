@@ -22,8 +22,8 @@ public class CloudGenerator : MonoBehaviour {
     }
     
     private void CreateCloud() {
-        // create a gameobject from the prefab
         GameObject createdCloud = Instantiate(cloudPrefab, new Vector2(Random.Range(-15, 15), Random.Range(-12, 12)), Quaternion.identity);
+        // create a gameobject from the prefab at a random location
         int cloudRand = Random.Range(1, 4);
         // a random from 1-3, used for choosing the cloud's size
         if (cloudRand == 1) {

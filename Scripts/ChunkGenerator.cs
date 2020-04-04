@@ -27,14 +27,21 @@ public class ChunkGenerator : MonoBehaviour {
     // whether or not to automatically update the map every time something changes
     [Header("Biome")] 
     public float biomeHueStrength;
+    // the strength of the hue to apply, bigger number is smaller effect
     public float biomeValueStrength;
+    // the strength of the value to apply, bigger number is smaller effect
     public float biomeValueOffset;
+    // how much to offset the initial value by
     public float biomeSaturationStrength;
+    // the strength of the saturation to apply, bigger number is smaller effect
     public float biomeSaturationOffset;
+    // how much to offset the initial saturation by
     public int biomeNoiseScale;
+    // how large to generate the noise
     public int biomeOctaves;
     [Range(0,1)] public float biomePersistence;
     public float biomeLacunarity;
+    // noise variables that apply to biomes
 
     [Header("Hue")]
     public float hueStrength;
@@ -56,29 +63,36 @@ public class ChunkGenerator : MonoBehaviour {
     float[,] biomeValueMap;
     float[,] biomeSaturationMap;
     float[,] ditherMap;
-    int[,] coralMap;
     float[,] noiseMap;
+    // 2d float arrays for heightmaps we create
     public GameObject chunkParent;
+    // the gameobject to child all the chunks to
     
     private void Awake() {
         chunks = new List<GameObject>();
+        // clear the chunk array
     }
 
 	public GameObject GenerateChunkAt(Vector2 center, bool removeExisting=false) {
         hueMap = Noise.GenerateHueMap(chunkSize, seed - 2, noiseScale, hueFrequency, center);
+        // hue map for oceans
         ditherMap = Noise.GenerateDitherMap(chunkSize, seed - 1, center, ditherStrength);
+        // universal dither map
 		noiseMap = Noise.GenerateNoiseMap(chunkSize, seed, noiseScale, octaves, persistence, lacunarity, center);
+        // basic height map
 		biomeHueMap = Noise.GenerateNoiseMap(chunkSize, seed + 1, biomeNoiseScale, biomeOctaves, biomePersistence, biomeLacunarity, center);
+        // hue map for biomes
 		biomeValueMap = Noise.GenerateNoiseMap(chunkSize, seed + 2, biomeNoiseScale, biomeOctaves, biomePersistence, biomeLacunarity, center);
+        // value map for biomes
 		biomeSaturationMap = Noise.GenerateNoiseMap(chunkSize, seed + 3, biomeNoiseScale, biomeOctaves, biomePersistence, biomeLacunarity, center);
-        // generate the noise map with the given variables
+        // saturation map for biomes
         Color[] colorMap = new Color[chunkSize * chunkSize];
         // make a new colormap to apply colors to
         float H, S, V;
+        // variables used for manipulating colors
         for (int y = 0; y < chunkSize; y++) {
             for (int x = 0; x < chunkSize; x++) {
                 // for every coordinate
-                // if apply falloffmap, alter (x,y) as such
                 float currentHeight = noiseMap[x, y];
                 // get the current height at (x, y)
                 for (int i = 0; i < regions.Length; i++) {
@@ -86,25 +100,25 @@ public class ChunkGenerator : MonoBehaviour {
                     if (currentHeight <= regions[i].height) {
                         // found the region that the point belongs to 
                         Color newColor = regions[i].color;
+                        // get the color of that region
                         if (currentHeight <= 0.2 && hueMap[x, y] > 0) {
+                            // if (x,y) is water and we want to apply a hue there (based on the heightmap)
                             Color.RGBToHSV(newColor, out H, out S, out V);
                             // get the HSV variables from the color
-                            newColor = Color.HSVToRGB(H - hueMap[x, y] / hueStrength, S, V);
-                            // use the hsv variables to create a new color, but with modified hue (make it more green or blue)
+                            newColor = Color.HSVToRGB(H - hueMap[x, y] / hueStrength, S + ditherMap[x,y] / 2, V + ditherMap[x,y]);
+                            // use the hsv variables to create a new color, but with modified hue (make it more green or blue), as well as adding a dither effect
                         }
                         else if (currentHeight > 0.2) {
+                            // else is on land
                             Color.RGBToHSV(newColor, out H, out S, out V);
+                            // get the HSV variables from the color
                             newColor = Color.HSVToRGB(
                                 H + ((biomeHueMap[x,y] + 1) / 2) / biomeHueStrength, 
-                                S + (biomeSaturationMap[x,y] - biomeSaturationOffset) / biomeSaturationStrength, 
-                                V + (biomeValueMap[x,y] - biomeValueOffset) / biomeValueStrength
+                                S + (biomeSaturationMap[x,y] - biomeSaturationOffset) / biomeSaturationStrength + ditherMap[x,y] / 2, 
+                                V + (biomeValueMap[x,y] - biomeValueOffset) / biomeValueStrength + ditherMap[x,y]
                             );
+                            // generate a new color from manipulating the hue, saturation, and value based on the 3 created heightmaps, as well as adding a dither effect
                         }
-                        
-                        Color.RGBToHSV(newColor, out H, out S, out V);
-                        // get the HSV variables from the color
-                        newColor = Color.HSVToRGB(H, S + ditherMap[x,y] / 2, V + ditherMap[x,y]);
-                        // use the hsv variables to create a new color, but with modified saturation and value
                         colorMap[y * chunkSize + x] = newColor;
                         // assign the color at given point to the colormap
                         break;

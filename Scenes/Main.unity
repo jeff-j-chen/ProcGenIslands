@@ -549,7 +549,7 @@ MonoBehaviour:
   waterSprite: {fileID: 21300000, guid: 7d5f0756ae9eb2942b056984af87abef, type: 3}
   _REQUIREDDELAY: 0.033333335
   soundManager: {fileID: 0}
-  _actionTimer: 0.3
+  _actionTimer: 0.1
   canMove: 1
   footstep: {fileID: 7899973923647215659, guid: 98d7f2382cb7db54581a9d85abdfbfd0,
     type: 3}

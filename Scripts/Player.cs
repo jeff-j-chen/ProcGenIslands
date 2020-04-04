@@ -4,7 +4,7 @@ using TMPro;
 
 public class Player : MonoBehaviour {
     public int viewDist;
-    // how fat away to load chunks
+    // how far away to load chunks
     public float maxSpeed;
     // the maximum speed of the player
     public float moveIncreaseRate;
@@ -36,27 +36,41 @@ public class Player : MonoBehaviour {
     public TextMeshProUGUI coordinates;
     // textmeshpro object representing the player's coordinates
     public Camera minimapCamera;
+    // camera showing the entire map
     public bool isOnLand = false;
+    // whether or not the player is on land
     private ChunkGenerator chunkGenerator;
+    // chunkgenerator script
     public Sprite landSprite;
+    // sprite used for the player on land
     public Sprite waterSprite;
+    // sprite used for the player on water
     public float _REQUIREDDELAY;
-    WaitForSeconds REQUIREDDELAY;
-    AudioSource[] sfx;
+    private WaitForSeconds REQUIREDDELAY;
+    // DO NOT DELETE
+    private AudioSource[] sfx;
+    // wind/water audiosources
     public SoundManager soundManager;
+    // soundmanager script
     public float _actionTimer;
-    WaitForSeconds actionTimer;
+    // float for how long the player needs to wait before making another move (land only)
+    private WaitForSeconds actionTimer;
+    // waitforseconds of _actiontimer, used to save memory
     public bool canMove = true;
+    // whether or not the player can move
     public GameObject footstep;
+    // the gameobject representing the player's footstep (prefab)
 
     private void Start() {
-        REQUIREDDELAY = new WaitForSeconds(_REQUIREDDELAY);
-        chunkGenerator = FindObjectOfType<ChunkGenerator>();
         particleLifetime = new WaitForSeconds(_particleLifetime);
+        REQUIREDDELAY = new WaitForSeconds(_REQUIREDDELAY);
         actionTimer = new WaitForSeconds(_actionTimer);
-        sfx = GetComponents<AudioSource>();
+        // create the waitforsecond objects
+        chunkGenerator = FindObjectOfType<ChunkGenerator>();
         soundManager = FindObjectOfType<SoundManager>();
-        // create the waitforseconds
+        // get necessary scripts
+        sfx = GetComponents<AudioSource>();
+        // get the audiosources
     }
    
     private void Update() {
@@ -117,21 +131,31 @@ public class Player : MonoBehaviour {
                     transform.eulerAngles = new Vector3(0f, 0f, 0f);
                     minimapIcon.transform.eulerAngles = new Vector3(0f, 0f, 0f);
                 }
+                // leave behind a footstep at the player's location (with a slight offset)
                 // move 1 unit based on player input
+                // update coordinate text
+                // play a random walking sound clip
+                // start coroutine to lock the player's actions
+                // set the player and minimap icon's rotations based on the player's input
             }
         }
         StartCoroutine(SetMovementMethod());
+        // begin setting the movement method and sprite (water/land)
         SetSfxVolume();
+        // set the volume of the sound effects based on the player's speed and height
     }
 
     private IEnumerator LockActions() {
         canMove = false;
+        // prevent player from moving
         yield return actionTimer;
+        // wait until the timer is done
         canMove = true;
+        // player can move again
     }
 
     private void FixedUpdate() {
-        // called a certain # of times per second, rather than per frame. makes it so that movement is fair between computers that run the game at different framerates
+        // called a certain # of times per second, rather than per frame. makes it so that movement is fair between computers that run the game at different framerates (if i remember correctly)
         if (!minimapCamera.enabled) {
             // only move if the minimap is off
             if (!isOnLand) {
@@ -169,30 +193,40 @@ public class Player : MonoBehaviour {
             }
         }
         else {
-            // if minimap camera is on, stop movement immediately
+            // if minimap camera is on
             GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
+            // stop movement immediately
         }
     }
 
     private float GetHeightAtPos() {
-        int x = 0;
+        int x;
+        // blank integers
         int roundedX = Mathf.RoundToInt(transform.position.x - 1);
-        int y = 0;
+        // get the player's position, rounded to the nearest position (and taking off one)
+        int y;
+        // blank integers
         int roundedY = Mathf.RoundToInt(transform.position.y - 1);
+        // get the player's position, rounded to the nearest position (and taking off one)
         if (roundedX > 0) { x = roundedX % 50; }
         else if (roundedX == 0) { x = 0; }
         else { x = 49 + ((roundedX + 1) % 50); }
+        // get the player's x position within a chunk based on the current position
         if (roundedY > 0) { y = roundedY % 50; }
         else if (roundedY == 0) { y = 0; }
         else { y = 49 + ((roundedY + 1) % 50); }
-        // convert the player's current position into (x,y) for indexing the current chunk's noisemap
+        // get the player's y position within a chunk based on the current position
         return chunkGenerator.centerChunk.GetComponent<Chunk>().noiseMap[x, y];
+        // get the noisemap height at that point
     }
 
     private IEnumerator SetMovementMethod() {
         float height = GetHeightAtPos();
+        // get the height at the position
         yield return REQUIREDDELAY;
+        // WAIT so there isn't a bug
         if (height == GetHeightAtPos()) {
+            // check that the height has not bugged
             if (height >= 0.2f) {
                 // if the player is now on land
                 if (!isOnLand) {
@@ -243,7 +277,7 @@ public class Player : MonoBehaviour {
         StartCoroutine(DestroyParticle(createdParticle));
         // destroy the particle after a delay
         if (moveVel != 0f) {
-            // if the player is not standing still
+            // if the player is not still
             createdParticle.GetComponent<Rigidbody2D>().velocity = new Vector2(-particleSpeed * Mathf.Cos(transform.eulerAngles.z * Mathf.PI / 180f  + (UnityEngine.Random.value * 2 - 1) * randOffset), -particleSpeed * Mathf.Sin(transform.eulerAngles.z * Mathf.PI / 180f + (UnityEngine.Random.value * 2 - 1) * randOffset));
             // give the particle a little bit of movement in the opposite direction (with slight directional offset)
         }
@@ -251,7 +285,9 @@ public class Player : MonoBehaviour {
 
     public IEnumerator DestroyParticle(GameObject particle) {
         yield return particleLifetime;
+        // wait how long each particle should last
         Destroy(particle);
+        // then destroy it
     }
 
     public bool PointInViewDist(Vector2 point) {

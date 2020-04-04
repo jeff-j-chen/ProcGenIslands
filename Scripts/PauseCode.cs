@@ -4,15 +4,18 @@ using UnityEngine.SceneManagement;
 public class PauseCode : MonoBehaviour {
 
     public bool gameIsPaused = false;
+    // whether or not the game is paused
     public GameObject pauseMenuUI;
+    // the gameobject with all the pause ui on it
 
     void Start() {
         pauseMenuUI.SetActive(false);
+        // set the pause menu to be inactive (unseen)
     }
 
-    // Update is called once per frame
     void Update() {
         if(Input.GetKeyDown(KeyCode.Escape)) {
+            // when player presses escape
             if (gameIsPaused) {
                 AudioListener.volume = 1;
                 Resume();
@@ -21,6 +24,7 @@ public class PauseCode : MonoBehaviour {
                 AudioListener.volume = 0;
                 Pause();
             }
+            // toggle the state (paused/unpaused) and change the listener volume accordingly
         }
     }
     public void Resume() {
@@ -39,4 +43,5 @@ public class PauseCode : MonoBehaviour {
     public void QuitGame() {
         Application.Quit();
     }
+    // pretty self explanatory, keep these functions out here as they are needed for hooking up to buttons
 }

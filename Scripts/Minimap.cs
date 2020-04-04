@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class Minimap : MonoBehaviour {
     public Camera mainCamera;
@@ -16,22 +15,30 @@ public class Minimap : MonoBehaviour {
     // same as in noise.cs
     private Vector2 origin = new Vector2(0.5f, 0.5f);
     private ChunkGenerator chunkGenerator;
-    private Rect mapRect;
+    // chunkgenerator script
     private Player player;
+    // player script
+    private Rect mapRect;
+    // so we don't have to create a new rectangle every time
     public float zoomLevel;
+    // the zoom of the map
     public float zoomIncrease;
+    // how much to increase/decrease the camera's orthographic size by
     public GameObject chunkParent;
-    Vector3 downPoint;
-
+    // gameobject with all the chunks childed to it
 
     private void Awake() {
         mainCamera.enabled = true;
         minimapCamera.enabled = false;
+        // set the main camera on
         chunkGenerator = FindObjectOfType<ChunkGenerator>();
+        // get the chunk generator
         player = FindObjectOfType<Player>();
+        // get the player
         mapRect = new Rect(0, 0, mapSize, mapSize);
+        // create the rect
         seed = chunkGenerator.seed;
-        // assign various things needed later on
+        // get the seed
     }
 
     private void Update() {
@@ -82,16 +89,25 @@ public class Minimap : MonoBehaviour {
         if (minimapCamera.enabled) {
             // if the minimap camera is enabled
             if (Input.GetAxis("Mouse ScrollWheel") > 0) {
+                // on scrolling down
                 if (minimapCamera.orthographicSize > zoomIncrease) {
+                    // if we aren't zooming into the negatives
                     zoomLevel -= zoomIncrease;
+                    // decrement zoom
                     minimapCamera.orthographicSize = zoomLevel;
+                    // set the camera's orthographic size
                 }
                 player.transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
+                // change the player's scale based on the minimap
             }
             else if (Input.GetAxis("Mouse ScrollWheel") < 0) {
+                // on scrolling up
                 zoomLevel += zoomIncrease;
+                // increment zoom
                 minimapCamera.orthographicSize = zoomLevel;
+                // set the camera's orthographic size
                 player.transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
+                // change the player's scaled based on the minimap
             }
             // zoom the minimaps and players in and out
         }
@@ -105,24 +121,20 @@ public class Minimap : MonoBehaviour {
         float[,] biomeHueMap = Noise.GenerateNoiseMap(mapSize, seed + 1, 5 * mapScale, 3, 0.5f, 1.5f, center);
 		float[,] biomeValueMap = Noise.GenerateNoiseMap(mapSize, seed + 2, 5 * mapScale, 3, 0.5f, 1.5f, center);
 		float[,] biomeSaturationMap = Noise.GenerateNoiseMap(mapSize, seed + 3, 5 * mapScale, 3, 0.5f, 1.5f, center);
-        float[,] hueMap = Noise.GenerateHueMap(mapSize, seed - 2, mapScale, 0.25f, center);        // create the maps
+        float[,] hueMap = Noise.GenerateHueMap(mapSize, seed - 2, mapScale, 0.25f, center);        
+        // create the necessary heightmaps
         Color[] colorMap = new Color[mapSize * mapSize];
         // create an array to place colors into
         for (int y = 0; y < mapSize; y++) {
             for (int x = 0; x < mapSize; x++) {
-                // for every point (x,y)
                 for (int i = 0; i < chunkGenerator.regions.Length; i++) {
-                    // for every region
                     float currentHeight = noiseMap[x,y];
                     float H, S, V;
                     if (currentHeight <= chunkGenerator.regions[i].height) {
-                        // found the region that the point belongs to
                         Color newColor = chunkGenerator.regions[i].color;
                         if (currentHeight <= 0.2 && hueMap[x, y] > 0) {
                             Color.RGBToHSV(newColor, out H, out S, out V);
-                            // get the HSV variables from the color
                             newColor = Color.HSVToRGB(H - hueMap[x, y] / 12f, S, V);
-                            // use the hsv variables to create a new color, but with modified hue (make it more green or blue)
                         }
                         else if (currentHeight > 0.2) {
                             Color.RGBToHSV(newColor, out H, out S, out V);
@@ -133,25 +145,18 @@ public class Minimap : MonoBehaviour {
                             );
                         }
                         colorMap[y * mapSize + x] = newColor;
-                        // assign the color at given point to the colormap
                         break;
-                        // no need to check other regions, so break out
                     }
                 }
             }
         }
+        // same loop as in chunkgenerator, just without the dithering and hard coded in variables
         Texture2D texture = new Texture2D(mapSize, mapSize);
-        // create a new texture
         texture.filterMode = FilterMode.Point;
-        // point (as opposed to bilinear) filtering
         texture.wrapMode = TextureWrapMode.Clamp;
-        // clamp (as opposed to wrap) wrap mode
         texture.SetPixels(colorMap);
-        // set the pixels of the texture
         texture.Apply();
-        // apply it
-        // GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, mapRect, origin, 1f, 0u, SpriteMeshType.FullRect);
         GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, mapSize, mapSize), origin, 1f, 0u, SpriteMeshType.FullRect);
-        // create a sprite from the chunk
+        // same as chunkgenerator
     }
 }

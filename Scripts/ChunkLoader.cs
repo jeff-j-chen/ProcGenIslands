@@ -22,6 +22,7 @@ public class ChunkLoader : MonoBehaviour {
         chunkGenerator.GenerateChunkAt(new Vector2(-24.5f, 25.5f));
         chunkGenerator.GenerateChunkAt(new Vector2(-24.5f, -24.5f));
         chunkGenerator.GenerateChunkAt(new Vector2(25.5f, -24.5f));
+        // generate chunks in a square around the player. use .5 so that player is aligned with the center rather than at the side
         waitTime = new WaitForSeconds(chunkUpdateDelay);
         // create the wait time
         player = FindObjectOfType<Player>();
@@ -52,12 +53,7 @@ public class ChunkLoader : MonoBehaviour {
             }
         }
     }
-
-    private bool PlayerIsInChunk(GameObject chunk) {
-        // checks if a player is within the bounds of a chunk
-        return chunk.transform.position.x - 25f < player.transform.position.x && player.transform.position.x < chunk.transform.position.x + 25f && chunk.transform.position.y - 25f < player.transform.position.y && player.transform.position.y < chunk.transform.position.y + 25f;
-    }
-
+    
     private void GenerateNewTestPositions() {
         // makes a list of potential positions to spawn chunks in
         testPositions.Clear();
