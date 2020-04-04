@@ -105,7 +105,7 @@ public class ChunkGenerator : MonoBehaviour {
                             // if (x,y) is water and we want to apply a hue there (based on the heightmap)
                             Color.RGBToHSV(newColor, out H, out S, out V);
                             // get the HSV variables from the color
-                            newColor = Color.HSVToRGB(H - hueMap[x, y] / hueStrength, S + ditherMap[x,y] / 2, V + ditherMap[x,y]);
+                            newColor = Color.HSVToRGB(H - hueMap[x, y] / hueStrength, S, V);
                             // use the hsv variables to create a new color, but with modified hue (make it more green or blue), as well as adding a dither effect
                         }
                         else if (currentHeight > 0.2) {
@@ -114,11 +114,15 @@ public class ChunkGenerator : MonoBehaviour {
                             // get the HSV variables from the color
                             newColor = Color.HSVToRGB(
                                 H + ((biomeHueMap[x,y] + 1) / 2) / biomeHueStrength, 
-                                S + (biomeSaturationMap[x,y] - biomeSaturationOffset) / biomeSaturationStrength + ditherMap[x,y] / 2, 
-                                V + (biomeValueMap[x,y] - biomeValueOffset) / biomeValueStrength + ditherMap[x,y]
+                                S + (biomeSaturationMap[x,y] - biomeSaturationOffset) / biomeSaturationStrength, 
+                                V + (biomeValueMap[x,y] - biomeValueOffset) / biomeValueStrength
                             );
                             // generate a new color from manipulating the hue, saturation, and value based on the 3 created heightmaps, as well as adding a dither effect
                         }
+                        Color.RGBToHSV(newColor, out H, out S, out V);
+                        // get the HSV variables from the color
+                        newColor = Color.HSVToRGB(H, S + ditherMap[x,y] / 2, V + ditherMap[x,y]);
+                        // apply dither, DO NOT COMBINE WITH HUE SETTINGS
                         colorMap[y * chunkSize + x] = newColor;
                         // assign the color at given point to the colormap
                         break;

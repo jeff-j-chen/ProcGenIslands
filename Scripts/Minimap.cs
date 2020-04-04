@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Minimap : MonoBehaviour {
     public Camera mainCamera;
@@ -26,6 +27,8 @@ public class Minimap : MonoBehaviour {
     // how much to increase/decrease the camera's orthographic size by
     public GameObject chunkParent;
     // gameobject with all the chunks childed to it
+    public GameObject minimapArtifact;
+    WaitForSeconds fixedUpdateDelay;
 
     private void Awake() {
         mainCamera.enabled = true;
@@ -39,6 +42,7 @@ public class Minimap : MonoBehaviour {
         // create the rect
         seed = chunkGenerator.seed;
         // get the seed
+        fixedUpdateDelay = new WaitForSeconds(1f / 50f);
     }
 
     private void Update() {
@@ -67,6 +71,12 @@ public class Minimap : MonoBehaviour {
                 // make the player render on top
                 transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 10f);
                 // move the minimap's position back
+                Artifact artifact = FindObjectOfType<Artifact>();
+                if (artifact != null) {
+                    artifact.transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
+                    artifact.GetComponent<SpriteRenderer>().sortingLayerName = "ui";
+                    artifact.GetComponent<SpriteRenderer>().sortingOrder = 4;
+                }
             }
             else {
                 chunkParent.transform.position = new Vector3(chunkParent.transform.position.x, chunkParent.transform.position.y, 0f);
@@ -83,6 +93,12 @@ public class Minimap : MonoBehaviour {
                 // make the player render on top of the chunks
                 transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 9f);
                 // move the minimap's position forwards
+                Artifact artifact = FindObjectOfType<Artifact>();
+                if (artifact != null) {
+                    artifact.transform.localScale = new Vector3(1f, 1f, 1f);
+                    artifact.GetComponent<SpriteRenderer>().sortingLayerName = "default";
+                    artifact.GetComponent<SpriteRenderer>().sortingOrder = 2;
+                }
             }
 
         }
@@ -90,26 +106,44 @@ public class Minimap : MonoBehaviour {
             // if the minimap camera is enabled
             if (Input.GetAxis("Mouse ScrollWheel") > 0) {
                 // on scrolling down
-                if (minimapCamera.orthographicSize > zoomIncrease) {
-                    // if we aren't zooming into the negatives
-                    zoomLevel -= zoomIncrease;
-                    // decrement zoom
-                    minimapCamera.orthographicSize = zoomLevel;
-                    // set the camera's orthographic size
-                }
+                zoomLevel /= zoomIncrease;
+                // decrease zoom
+                minimapCamera.orthographicSize = zoomLevel;
+                // set the camera's orthographic size
                 player.transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
+                FindObjectOfType<Artifact>().transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
                 // change the player's scale based on the minimap
             }
             else if (Input.GetAxis("Mouse ScrollWheel") < 0) {
                 // on scrolling up
-                zoomLevel += zoomIncrease;
+                zoomLevel *= zoomIncrease;
                 // increment zoom
                 minimapCamera.orthographicSize = zoomLevel;
                 // set the camera's orthographic size
                 player.transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
+                FindObjectOfType<Artifact>().transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
                 // change the player's scaled based on the minimap
             }
             // zoom the minimaps and players in and out
+        }
+    }
+
+    public void CreateArtifactOnMinimap(GameObject artifact) {
+        try { Destroy(transform.GetChild(0)); } catch {}
+        minimapArtifact = Instantiate(artifact, new Vector2(0f, 0f), Quaternion.identity);
+        Destroy(minimapArtifact.GetComponent<Artifact>());
+        minimapArtifact.GetComponent<SpriteRenderer>().sprite = FindObjectOfType<ArtifactGenerator>().artifactSprites[minimapArtifact.GetComponent<Artifact>().artifactNum];
+        minimapArtifact.transform.parent = transform;
+        minimapArtifact.transform.position = new Vector3(0f, 0f, 0f);
+        StartCoroutine(StartUpdatingArtifact());
+    }
+
+    private IEnumerator StartUpdatingArtifact() {
+        while (true) {
+            minimapArtifact.transform.localPosition = new Vector3((player.transform.position.x - FindObjectOfType<Artifact>().transform.position.x) * (mapScale / chunkGenerator.noiseScale), (player.transform.position.y - FindObjectOfType<Artifact>().transform.position.y) * (mapScale / chunkGenerator.noiseScale), -1f);
+            print($"({(player.transform.position.x - FindObjectOfType<Artifact>().transform.position.x)}, {(player.transform.position.y - FindObjectOfType<Artifact>().transform.position.y)})");
+            // if outside bounds limit ot be on the bound
+            yield return fixedUpdateDelay;
         }
     }
 
