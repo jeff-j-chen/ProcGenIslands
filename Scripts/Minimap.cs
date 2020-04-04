@@ -129,20 +129,25 @@ public class Minimap : MonoBehaviour {
     }
 
     public void CreateArtifactOnMinimap(GameObject artifact) {
-        try { Destroy(transform.GetChild(0)); } catch {}
+        try { Destroy(transform.GetChild(0).gameObject); } catch {}
         minimapArtifact = Instantiate(artifact, new Vector2(0f, 0f), Quaternion.identity);
         Destroy(minimapArtifact.GetComponent<Artifact>());
         minimapArtifact.GetComponent<SpriteRenderer>().sprite = FindObjectOfType<ArtifactGenerator>().artifactSprites[minimapArtifact.GetComponent<Artifact>().artifactNum];
         minimapArtifact.transform.parent = transform;
         minimapArtifact.transform.position = new Vector3(0f, 0f, 0f);
+        minimapArtifact.transform.localScale = new Vector3(5f, 5f, 1f);
         StartCoroutine(StartUpdatingArtifact());
     }
 
     private IEnumerator StartUpdatingArtifact() {
         while (true) {
-            minimapArtifact.transform.localPosition = new Vector3((player.transform.position.x - FindObjectOfType<Artifact>().transform.position.x) * (mapScale / chunkGenerator.noiseScale), (player.transform.position.y - FindObjectOfType<Artifact>().transform.position.y) * (mapScale / chunkGenerator.noiseScale), -1f);
-            print($"({(player.transform.position.x - FindObjectOfType<Artifact>().transform.position.x)}, {(player.transform.position.y - FindObjectOfType<Artifact>().transform.position.y)})");
-            // if outside bounds limit ot be on the bound
+            if (minimapArtifact != null) {
+                minimapArtifact.transform.localPosition = new Vector3(
+                    Mathf.Clamp((FindObjectOfType<Artifact>().transform.position.x - player.transform.position.x) * (mapScale / chunkGenerator.noiseScale), -23.75f, 23.75f), 
+                    Mathf.Clamp((FindObjectOfType<Artifact>().transform.position.y - player.transform.position.y) * (mapScale / chunkGenerator.noiseScale), -23.75f, 23.75f), 
+                    -1f
+                );
+            }
             yield return fixedUpdateDelay;
         }
     }

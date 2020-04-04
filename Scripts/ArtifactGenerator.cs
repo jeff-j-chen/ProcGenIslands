@@ -46,7 +46,6 @@ public class ArtifactGenerator : MonoBehaviour {
                     createdArtifact.GetComponent<Artifact>().artifactNum = Random.Range(0, 4);
                     createdArtifact.GetComponent<SpriteRenderer>().sprite = artifactSprites[createdArtifact.GetComponent<Artifact>().artifactNum];
                     FindObjectOfType<Minimap>().CreateArtifactOnMinimap(createdArtifact);
-                    print("successfully created artifact");
                 }
                 else {
                     chunkGenerator.chunks.Remove(newChunk);
