@@ -87,6 +87,7 @@ public class Player : MonoBehaviour {
                     coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
                     soundManager.PlayClip($"walking{Random.Range(0, 4)}");
                     StartCoroutine(LockActions());
+                    transform.eulerAngles = new Vector3(0f, 0f, 90f);
                     minimapIcon.transform.eulerAngles = new Vector3(0f, 0f, 90f);
                 }
                 else if (Input.GetKeyDown(KeyCode.DownArrow)) {
@@ -95,6 +96,7 @@ public class Player : MonoBehaviour {
                     coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
                     soundManager.PlayClip($"walking{Random.Range(0, 4)}");
                     StartCoroutine(LockActions());
+                    transform.eulerAngles = new Vector3(0f, 0f, -90f);
                     minimapIcon.transform.eulerAngles = new Vector3(0f, 0f, -90f);
                 }
                 else if (Input.GetKeyDown(KeyCode.LeftArrow)) {
@@ -103,6 +105,7 @@ public class Player : MonoBehaviour {
                     coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
                     soundManager.PlayClip($"walking{Random.Range(0, 4)}");
                     StartCoroutine(LockActions());
+                    transform.eulerAngles = new Vector3(0f, 0f, 180f);
                     minimapIcon.transform.eulerAngles = new Vector3(0f, 0f, 180f);
                 }
                 else if (Input.GetKeyDown(KeyCode.RightArrow)) {
@@ -111,6 +114,7 @@ public class Player : MonoBehaviour {
                     coordinates.text = $"x: {Mathf.Round(transform.position.x)}\ny: {Mathf.Round(transform.position.y)}";
                     soundManager.PlayClip($"walking{Random.Range(0, 4)}");
                     StartCoroutine(LockActions());
+                    transform.eulerAngles = new Vector3(0f, 0f, 0f);
                     minimapIcon.transform.eulerAngles = new Vector3(0f, 0f, 0f);
                 }
                 // move 1 unit based on player input
@@ -229,7 +233,7 @@ public class Player : MonoBehaviour {
         }
         else {
             sfx[0].volume = (moveVel / maxSpeed) / 10f + 0.025f; // water
-            sfx[1].volume = (moveVel / maxSpeed) / 5f + 0.05f; // wind
+            sfx[1].volume = (moveVel / maxSpeed) / 5f + 0.2f; // wind
         }
     }
     

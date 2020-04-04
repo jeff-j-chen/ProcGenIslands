@@ -35,7 +35,7 @@ public class Minimap : MonoBehaviour {
     }
 
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.Tab)) {
+        if (Input.GetKeyDown(KeyCode.Tab) && !FindObjectOfType<PauseCode>().gameIsPaused) {
             // on tab press
             minimapCamera.orthographicSize = zoomLevel;
             // set the camera's size to the zoom level
@@ -82,14 +82,14 @@ public class Minimap : MonoBehaviour {
         if (minimapCamera.enabled) {
             // if the minimap camera is enabled
             if (Input.GetAxis("Mouse ScrollWheel") > 0) {
-                if (minimapCamera.orthographicSize > zoomIncrease) { 
-                    zoomLevel -= zoomIncrease; 
+                if (minimapCamera.orthographicSize > zoomIncrease) {
+                    zoomLevel -= zoomIncrease;
                     minimapCamera.orthographicSize = zoomLevel;
                 }
                 player.transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
             }
             else if (Input.GetAxis("Mouse ScrollWheel") < 0) {
-                zoomLevel += zoomIncrease; 
+                zoomLevel += zoomIncrease;
                 minimapCamera.orthographicSize = zoomLevel;
                 player.transform.localScale = new Vector3(zoomLevel / 10f, zoomLevel / 10f, 1f);
             }
@@ -121,14 +121,14 @@ public class Minimap : MonoBehaviour {
                         if (currentHeight <= 0.2 && hueMap[x, y] > 0) {
                             Color.RGBToHSV(newColor, out H, out S, out V);
                             // get the HSV variables from the color
-                            newColor = Color.HSVToRGB(H - hueMap[x, y] / 0.25f, S, V);
+                            newColor = Color.HSVToRGB(H - hueMap[x, y] / 12f, S, V);
                             // use the hsv variables to create a new color, but with modified hue (make it more green or blue)
                         }
                         else if (currentHeight > 0.2) {
                             Color.RGBToHSV(newColor, out H, out S, out V);
                             newColor = Color.HSVToRGB(
-                                H + ((biomeHueMap[x,y] + 1) / 2) / 2.333333f, 
-                                S + (biomeSaturationMap[x,y] - 0.2f) / 1f, 
+                                H + ((biomeHueMap[x,y] + 1) / 2) / 2.333333f,
+                                S + (biomeSaturationMap[x,y] - 0.2f) / 1f,
                                 V + (biomeValueMap[x,y] - 0.4f) / 4f
                             );
                         }

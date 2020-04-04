@@ -14,9 +14,11 @@ public class PauseCode : MonoBehaviour {
     void Update() {
         if(Input.GetKeyDown(KeyCode.Escape)) {
             if (gameIsPaused) {
+                AudioListener.volume = 1;
                 Resume();
             }
             else {
+                AudioListener.volume = 0;
                 Pause();
             }
         }
